@@ -18,8 +18,8 @@ mirroring the existing C++ module boundaries while observing Rust idioms:
     datastructs/      # bit vectors, FPB, sparse vectors
     geometry/         # Point3D, transforms, uniform grids
     numerics/         # thin wrappers around nalgebra + optimizers
-    forcefield/       # generic FF engine + contrib traits
-    forcefield-uff/   # UFF parameterisation
+    forcefield-core/  # generic FF engine + contrib traits (current crate)
+    forcefield-uff/   # UFF parameterisation (build-generated tables)
     forcefield-mmff/  # MMFF94 parameterisation
     distgeom/         # bounds matrix, triangle smoothing, embedding support
     graphmol/         # Atom, Bond, Mol (single struct), conformers, descriptors, etc.
@@ -77,10 +77,10 @@ larger black-box tests in the workspace’s `tests/` directory.
 2. **Numerics + Optimiser**  
    Port BFGS optimiser using nalgebra; expose generic `Minimise` trait.
 
-3. **ForceField engine**  
-   Translate generic engine (`ForceField` struct) with trait object list of
-   `dyn Contrib`.  Provide UFF parameterisation first.  Use const generics to
-   fix dimension (3) and allow zero-cost abstraction.
+3. **ForceField engine**  (`forcefield-core` crate)  
+   Implement generic engine (`ForceField` struct) with trait object list of
+   `dyn Contrib`.  Provide UFF parameterisation first via `forcefield-uff`.
+   Use const generics to fix dimension (3) and allow zero-cost abstraction.
 
 4. **DistGeom**  
    Bounds matrix, triangle smoothing, random distance mat sampling, embedding.
@@ -145,7 +145,7 @@ larger black-box tests in the workspace’s `tests/` directory.
 
 1. Workspace bootstrapped; `rdkit-core`, `geometry` crate compiling (2 weeks).
 2. `datastructs` port with ExplicitBitVect + unit tests (2–3 weeks).
-3. `forcefield` generic engine + UFF minimal terms; energy tests passing
+3. `forcefield-core` generic engine + UFF minimal terms; energy tests passing
    (3–4 weeks).
 4. DistGeom embedding (ETKDG) reproduces reference coordinates (4–6 weeks).
 5. Basic `graphmol` (atoms, bonds, stereochem) + SMILES parsing (keeper for
