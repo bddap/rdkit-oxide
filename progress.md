@@ -163,8 +163,12 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [ ] Advanced valence rules (hypervalent S, P, formal charge handling).
 
 - [ ] SMILES/SMARTS support
-  - [ ] Tokeniser and parser for SMILES (atoms, bonds, branches, ring indices).
-  - [ ] Round-trip tests with reference molecules.
+  - [ ] 1. Lexer/tokeniser with unit tests.
+  - [ ] 2. Core SMILES parser (atoms, bonds, branches, ring closure).
+  - [ ] 3. Bracket-atom field parser & application.
+  - [ ] 4. Post-parse sanitisation (implicit H & aromaticity).
+  - [ ] 5. Regression test-suite with positive/negative cases.
+  - [ ] 6. SMARTS extensions (after SMILES stable).
 
 - [ ] Ring perception & aromaticity
   - [ ] SSSR cycle basis computation; flag atoms/bonds in rings.
@@ -193,4 +197,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Add hydrogen count inference to MolBuilder sanitisation**
+Currently working on: **Stage 5 – SMILES lexer/tokeniser implementation**
