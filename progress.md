@@ -47,7 +47,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 ## Stage 2.5 – Unit test catalogue (in progress)
 
 - [ ] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
-  - [ ] RDGeneral tests
+  - [x] RDGeneral tests (legacy-rdkit-map/tests.md)
   - [ ] DataStructs tests
   - [ ] Geometry & DistGeom tests
   - [ ] ForceField tests
@@ -72,4 +72,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – RDGeneral tests catalogue.”**
+Currently working on: **“Stage 2.5 – DataStructs tests catalogue.”**
