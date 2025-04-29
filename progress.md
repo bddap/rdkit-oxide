@@ -141,7 +141,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] GraphMol core datastructs (upcoming major set)
   - [ ] Atom, Bond enums / structs with properties.
-  - [ ] ROMol graph with adjacency list (uses `petgraph`?)
+  - [ ] Single `Mol` struct backed by `petgraph::Graph`.
+  - [ ] Implement `MolEditor` session wrapper with dirty flag & explicit commit.
   - [ ] Basic sanitisation & valence model.
 
 - [ ] Dependency evaluation / ecosystem
