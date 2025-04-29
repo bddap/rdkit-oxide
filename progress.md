@@ -39,7 +39,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Query (legacy-rdkit-map/Query.md)
   - [-] RDBoost (skip – no Rust port)
   - [x] RDGeneral (legacy-rdkit-map/RDGeneral.md)
-  - [ ] RDStreams
+  - [x] RDStreams (legacy-rdkit-map/RDStreams.md)
   - [ ] SimDivPickers
 
 - [ ] Recursively expand the checklist for each sub-module once its parent summary is done.
@@ -64,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for RDStreams.”**
+Currently working on: **“Stage 2 – Detailed map for SimDivPickers.”**
