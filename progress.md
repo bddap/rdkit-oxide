@@ -17,7 +17,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] DistGeom (legacy-rdkit-map/DistGeom.md)
   - [x] Features (legacy-rdkit-map/Features.md)
   - [x] ForceField (legacy-rdkit-map/ForceField.md)
-  - [ ] Geometry
+  - [x] Geometry (legacy-rdkit-map/Geometry.md)
   - [ ] GraphMol
   - [-] JavaWrappers (skip – no Rust port)
   - [ ] ML
@@ -52,4 +52,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `Geometry` module.”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` module (root summary – submodules will be split later).”**
