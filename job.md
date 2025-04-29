@@ -60,11 +60,12 @@ Remember, if things get out of hand, git can take you back to a known-good state
 # Competion
 
 You are under no time-constraints. Go deep, complete the job completely and correctly, it's ok for this to take months.
-Complete all the entirety of this job before reporting back to the user.
+Your context will be automatically compacted as required. Messages to the user will go unread.
+Systematically complete each stage and todo before reporting back to the user.
 
 # Tracking Your Progress
 
-Your context will eventually overflow and will need to be trimmed. Maintain a to-do structure in ./progress.md in order to survive context switches.  
+Your context will eventually overflow and will need to be trimmed. Maintain a to-do structure in ./progress.md in order to survive context switches.
 You are responsible for inserting to-dos and sub-to-dos into ./progress.md, and for checking off completed items (with the paths to your relevant output).
 
 In the last line of ./progress.md, track what you are currently working on. When you finish a task:
