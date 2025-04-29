@@ -161,6 +161,17 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [ ] Ring perception (SSSR) and aromaticity flags.
     - [ ] Stereochemistry initialisation (chirality markers).
     - [ ] Advanced valence rules (hypervalent S, P, formal charge handling).
+
+- [ ] SMILES/SMARTS support
+  - [ ] Tokeniser and parser for SMILES (atoms, bonds, branches, ring indices).
+  - [ ] Round-trip tests with reference molecules.
+
+- [ ] Ring perception & aromaticity
+  - [ ] SSSR cycle basis computation; flag atoms/bonds in rings.
+  - [ ] Simple Hueckel aromaticity detection; set aromatic flags.
+
+- [ ] Mol ↔ ForceField bridge
+  - [ ] Helper to convert Mol into ForceField (add bonds/angles/torsions automatically, default charges).
   - [ ] SMILES parser producing `Mol`.
 
 - [ ] Dependency evaluation / ecosystem
