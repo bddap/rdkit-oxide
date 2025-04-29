@@ -17,7 +17,7 @@ pub fn count_bits(buf: &[u8]) -> u32 {
 }
 
 /// Explicit (dense) bit vector.
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExplicitBitVect {
     bits: BitVec<u8, Lsb0>,
 }
@@ -88,6 +88,18 @@ impl ExplicitBitVect {
             .enumerate()
             .filter_map(|(idx, bit)| if *bit { Some(idx) } else { None })
             .collect()
+    }
+
+    /// Serialise using bincode and encode as base64 string.
+    pub fn to_base64(&self) -> String {
+        let bytes = bincode::serialize(self).expect("serialize ExplicitBitVect");
+        base64::encode(bytes)
+    }
+
+    /// Decode from base64 string.
+    pub fn from_base64(s: &str) -> Self {
+        let bytes = base64::decode(s).expect("decode base64 ExplicitBitVect");
+        bincode::deserialize(&bytes).expect("deserialize ExplicitBitVect")
     }
 
     pub fn num_on_bits(&self) -> u32 {
@@ -312,5 +324,10 @@ mod tests {
 
         // Tanimoto similarity self
         assert!((bv.tanimoto_similarity(&bv2) - (2.0 / (3.0))).abs() < 1e-6);
+
+        // base64 round-trip via serde/bincode
+        let b64 = bv.to_base64();
+        let decoded = ExplicitBitVect::from_base64(&b64);
+        assert_eq!(bv, decoded);
     }
 }

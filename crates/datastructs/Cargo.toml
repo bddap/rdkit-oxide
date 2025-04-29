@@ -5,7 +5,10 @@ edition = "2021"
 
 [dependencies]
 rdkit-core = { path = "../rdkit-core" }
-bitvec = "1"
+bitvec = { version = "1", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+bincode = "1"
+base64 = "0.21"
 
 [dev-dependencies]
 approx = "0.5"

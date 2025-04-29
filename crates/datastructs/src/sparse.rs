@@ -7,7 +7,7 @@ use std::fmt;
 use std::ops::{BitAnd, BitOr, BitXor, Not};
 
 /// A sparse bit-vector with a fixed length.
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct SparseBitVect {
     size: u32,
     bits: HashSet<u32>,
@@ -71,6 +71,17 @@ impl SparseBitVect {
     /// Return iterator of set-bit indices.
     pub fn on_bits(&self) -> impl Iterator<Item = u32> + '_ {
         self.bits.iter().copied()
+    }
+
+    /// Base64 serialization (bincode + base64).
+    pub fn to_base64(&self) -> String {
+        let bytes = bincode::serialize(self).expect("serialize SparseBitVect");
+        base64::encode(bytes)
+    }
+
+    pub fn from_base64(s: &str) -> Self {
+        let bytes = base64::decode(s).expect("decode SparseBitVect");
+        bincode::deserialize(&bytes).expect("deserialize SparseBitVect")
     }
 }
 
