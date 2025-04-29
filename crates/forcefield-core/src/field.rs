@@ -1171,7 +1171,7 @@ impl ForceField {
 
     /// Mutable access to a specific atom by index.  Used primarily by unit
     /// tests and optimisation helpers.
-    #[cfg_attr(not(test), allow(dead_code))]
+    #[cfg(test)]
     pub(crate) fn get_atom_mut(&mut self, idx: usize) -> &mut Atom {
         &mut self.atoms[idx]
     }
