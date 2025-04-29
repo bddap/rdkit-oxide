@@ -21,6 +21,19 @@ DataStructs::ExplicitBitVect -> implemented in -> Code/DataStructs/ExplicitBitVe
 DataStructs::ExplicitBitVect -> defined in -> Code/DataStructs/ExplicitBitVect.h
 DataStructs::ExplicitBitVect::getNumOnBits -> calls -> BitOps::countBits
 
+DataStructs::SparseBitVect -> implemented in -> Code/DataStructs/SparseBitVect.cpp
+DataStructs::SparseBitVect -> defined in -> Code/DataStructs/SparseBitVect.h
+DataStructs::SparseBitVect::getTotalVal -> calls -> DataStructs::SparseIntVect::getTotalVal
+
+DataStructs::BitOps::countBits -> implemented in -> Code/DataStructs/BitOps.cpp
+DataStructs::BitOps::countBits -> defined in -> Code/DataStructs/BitOps.h
+
+DataStructs::FPBReader -> implemented in -> Code/DataStructs/FPBReader.cpp
+DataStructs::FPBReader -> defined in -> Code/DataStructs/FPBReader.h
+DataStructs::FPBReader::getFingerprint -> calls -> DataStructs::BitOps::copyBitsToBuffer
+DataStructs::MultiFPBReader -> implemented in -> Code/DataStructs/MultiFPBReader.cpp
+DataStructs::MultiFPBReader::getFingerprint -> calls -> DataStructs::FPBReader::getFingerprint
+
 GraphMol::ROMol -> implemented in -> Code/GraphMol/ROMol.cpp
 GraphMol::ROMol -> defined in -> Code/GraphMol/ROMol.h
 GraphMol::ROMol::addBond -> calls -> GraphMol::Bond

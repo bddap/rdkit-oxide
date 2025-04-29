@@ -70,7 +70,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] Create `legacy-rdkit-map/map.md` with text graph of symbol relationships.
   - [x] Skeleton graph with root module examples (commit b02e15a^..)
-  - [ ] Expand DataStructs relationships
+  - [x] Expand DataStructs relationships (map.md)
   - [ ] Expand GraphMol core relationships
   - [ ] Expand Fingerprints & Descriptors relationships
   - [ ] Expand ForceField relationships
@@ -90,4 +90,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 2.5 status: complete ✅
 
-Currently working on: **“Stage 3 – Expand DataStructs relationships.”**
+Currently working on: **“Stage 3 – Expand GraphMol core relationships.”**
