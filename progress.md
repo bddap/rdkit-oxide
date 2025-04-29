@@ -38,7 +38,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [-] PgSQL (skip – no Rust port)
   - [x] Query (legacy-rdkit-map/Query.md)
   - [-] RDBoost (skip – no Rust port)
-  - [ ] RDGeneral
+  - [x] RDGeneral (legacy-rdkit-map/RDGeneral.md)
   - [ ] RDStreams
   - [ ] SimDivPickers
 
@@ -64,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for RDGeneral.”**
+Currently working on: **“Stage 2 – Detailed map for RDStreams.”**
