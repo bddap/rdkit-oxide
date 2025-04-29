@@ -32,7 +32,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [ ] DistGeomHelpers & ForceFieldHelpers
   - [-] JavaWrappers (skip – no Rust port)
   - [ ] ML
-  - [ ] MinimalLib
+  - [-] MinimalLib (skip – wasm viewer only)
   - [ ] Numerics
   - [-] PgSQL (skip – no Rust port)
   - [ ] Query
