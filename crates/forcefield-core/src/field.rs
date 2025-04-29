@@ -14,6 +14,8 @@ pub struct AtomIdx(pub usize);
 pub struct Atom {
     pub label: String,   // UFF label (e.g. "C_3")
     pub coord: Point3D,  // Cartesian Å
+
+    pub charge: f64,     // partial charge (e)
 }
 
 // ---------------------------------------------------------------------------
@@ -479,6 +481,22 @@ mod tests {
             assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
         }
     }
+
+    #[test]
+    fn default_charge_assignment() {
+        let mut ff = ForceField::default();
+        let c = ff.add_atom("C_3", Point3D(0.0, 0.0, 0.0));
+        let o = ff.add_atom("O_3", Point3D(1.2, 0.0, 0.0));
+
+        ff.assign_default_charges();
+
+        // Charges should be populated
+        assert!((ff.atoms[c.0].charge + 0.027).abs() < 1e-3);
+        assert!((ff.atoms[o.0].charge + 0.5).abs() < 1e-3);
+
+        // Coulomb pair list should have one entry
+        assert_eq!(ff.coulomb_pairs.len(), 1);
+    }
 }
 
 
@@ -557,6 +575,7 @@ impl ForceField {
         self.atoms.push(Atom {
             label: label.into(),
             coord,
+            charge: 0.0,
         });
         idx
     }
@@ -622,6 +641,37 @@ impl ForceField {
 
     pub fn add_coulomb_pair(&mut self, a: AtomIdx, b: AtomIdx, q_a: f64, q_b: f64) {
         self.coulomb_pairs.push(CoulombPair { a, b, q_a, q_b });
+    }
+
+    /// Assign default UFF partial charges (if available) and populate the
+    /// Coulomb pair list for **all** atom pairs.  Existing `coulomb_pairs` are
+    /// cleared beforehand.
+    pub fn assign_default_charges(&mut self) {
+        use forcefield_uff::charge as uff_charge;
+
+        // Set charges on atoms.
+        for atom in &mut self.atoms {
+            if let Some(q) = uff_charge::get(&atom.label) {
+                atom.charge = q;
+            }
+        }
+
+        // Rebuild pair list.
+        self.coulomb_pairs.clear();
+        let n = self.atoms.len();
+        for i in 0..n {
+            let qi = self.atoms[i].charge;
+            if qi.abs() < 1e-12 {
+                continue;
+            }
+            for j in (i + 1)..n {
+                let qj = self.atoms[j].charge;
+                if qj.abs() < 1e-12 {
+                    continue;
+                }
+                self.add_coulomb_pair(AtomIdx(i), AtomIdx(j), qi, qj);
+            }
+        }
     }
 
     // -------------------------------------------------------------------

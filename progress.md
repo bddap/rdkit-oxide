@@ -175,4 +175,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Port UFF parameter-driven charge assignment helper (optional)**
+Currently working on: **Stage 5 – Integrate default charge assignment into ForceField builder utilities**
