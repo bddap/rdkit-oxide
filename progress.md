@@ -72,7 +72,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Skeleton graph with root module examples (commit b02e15a^..)
   - [x] Expand DataStructs relationships (map.md)
     - [x] Expand GraphMol core relationships (map.md)
-  - [ ] Expand Fingerprints & Descriptors relationships
+    - [x] Expand Fingerprints & Descriptors relationships (map.md)
   - [ ] Expand ForceField relationships
   - [ ] Expand DistGeomHelpers & ForceFieldHelpers relationships
 
@@ -90,4 +90,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 2.5 status: complete ✅
 
-Currently working on: **“Stage 3 – Expand Fingerprints & Descriptors relationships.”**
+Currently working on: **“Stage 3 – Expand ForceField relationships.”**

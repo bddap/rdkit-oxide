@@ -58,6 +58,28 @@ GraphMol::Conformer -> implemented in -> Code/GraphMol/Conformer.cpp
 GraphMol::Conformer -> defined in -> Code/GraphMol/Conformer.h
 GraphMol::Conformer::getAtomPos -> returns -> Geometry::Point3D
 
+# GraphMol – Fingerprints relationships
+
+GraphMol::Fingerprints::AtomPair::getFingerprint -> implemented in -> Code/GraphMol/Fingerprints/AtomPairGenerator.cpp
+GraphMol::Fingerprints::AtomPair::getFingerprint -> calls -> DataStructs::SparseIntVect
+
+GraphMol::Fingerprints::MorganGenerator::getFingerprint -> implemented in -> Code/GraphMol/Fingerprints/MorganGenerator.cpp
+GraphMol::Fingerprints::MorganGenerator::getFingerprint -> calls -> GraphMol::Canon::getMorganCode
+
+GraphMol::Fingerprints::RDKitFPGenerator::getFingerprint -> implemented in -> Code/GraphMol/Fingerprints/RDKitFPGenerator.cpp
+GraphMol::Fingerprints::RDKitFPGenerator::getFingerprint -> uses -> DataStructs::ExplicitBitVect
+
+# GraphMol – Descriptors relationships
+
+GraphMol::Descriptors::CalcTPSA -> implemented in -> Code/GraphMol/Descriptors/MolSurf.cpp
+GraphMol::Descriptors::CalcTPSA -> calls -> GraphMol::Descriptors::getAtomTR
+
+GraphMol::Descriptors::BCUT2D -> implemented in -> Code/GraphMol/Descriptors/BCUT2D.cpp
+GraphMol::Descriptors::BCUT2D -> calls -> Numerics::Matrix
+
+GraphMol::Descriptors::RDF -> implemented in -> Code/GraphMol/Descriptors/RDF.cpp
+GraphMol::Descriptors::RDF -> uses -> Geometry::UniformGrid3D
+
 -------------------------------------------------------------------------------
 
 More detailed per-function edges will be appended incrementally in subsequent
