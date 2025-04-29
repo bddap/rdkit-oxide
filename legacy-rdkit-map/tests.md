@@ -24,6 +24,22 @@ tests to Rust.
 ------------------------------------------------------------------------------
 
 Pending sections: DataStructs, Geometry/DistGeom, ForceField, GraphMol, SimDivPickers, Numerics, Misc.
+Completed: RDGeneral, DataStructs
+
+------------------------------------------------------------------------------
+
+## Geometry & DistGeom
+
+| File | Key tests | Purpose |
+|------|-----------|---------|
+| `Geometry/catch_tests.cpp` | `TEST_CASE("construct Point2D from Point3D")` – verifies 2D projection ctor.<br>`TEST_CASE("UniformGrid getGridIndex")` – bounds checking and dimension calc.<br>`TEST_CASE("UniformGrid copying")` – copy/serialise UniformGrid.<br>`TEST_CASE("UniformGrid get/setVal")` – occupancy updates and totals. | Ensures geometry primitives (`Point`, `UniformGrid3D`) behave correctly and serialise round‐trip. |
+| `Geometry/testGrid.cpp` | Functions `test1()` – insert spheres into `UniformGrid3D` and compare occupancy.<br>Main aggregates tests. | Early regression tests predating Catch; focuses on grid neighbour enumeration accuracy. |
+| `Geometry/testRealValueGrid.cpp` | Similar to above but for `UniformRealValueGrid3D` storing double values; checks interpolation and point distance weight. |
+| `Geometry/testTransforms.cpp` | Multiple `TEST_ASSERT` blocks cover quaternion rotation matrices, axis–angle conversions, 2D/3D transform composition, and inversion accuracy. | Verifies `Transform3D` math. |
+| `DistGeom/testDistGeom.cpp` | `test1()` – triangle smoothing of bounds matrix with analytical expectations.<br>`testIssue216()` – reproduces bug #216 ensuring initial coordinate generation from symmetric matrix yields unit edge lengths.<br>Main() runs and prints via RDLog. | Core validation of distance-geometry numeric routines (`BoundsMatrix`, `computeInitialCoords`). |
+
+Pending sections: ForceField, GraphMol, SimDivPickers, Numerics, Misc.
+
 
 ------------------------------------------------------------------------------
 
