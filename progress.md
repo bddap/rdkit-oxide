@@ -156,6 +156,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Single `Mol` struct (vec-based) placeholder (crates/rdkit-core/mol.rs). Switch to `petgraph` later if needed.
   - [ ] Implement `MolEditor` session wrapper with dirty flag & explicit commit.
   - [ ] Basic sanitisation & valence model.
+  - [ ] SMILES parser producing `Mol`.
 
 - [ ] Dependency evaluation / ecosystem
   - [ ] Decide whether to depend on `nalgebra` vs home-brew algebra.
@@ -176,4 +177,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Implement MolEditor wrapper for rdkit-core::Mol**
+Currently working on: **Stage 5 – Implement Mol sanitisation (valence check) in MolBuilder::finish()**
