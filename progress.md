@@ -152,8 +152,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [ ] Re-enable methane optimisation energy test once missing terms implemented (see shame.md).
 
 - [ ] GraphMol core datastructs (upcoming major set)
-  - [ ] Atom, Bond enums / structs with properties.
-  - [ ] Single `Mol` struct backed by `petgraph::Graph`.
+  - [x] Atom, Bond enums / structs with properties (crates/rdkit-core/mol.rs).
+  - [x] Single `Mol` struct (vec-based) placeholder (crates/rdkit-core/mol.rs). Switch to `petgraph` later if needed.
   - [ ] Implement `MolEditor` session wrapper with dirty flag & explicit commit.
   - [ ] Basic sanitisation & valence model.
 
@@ -176,4 +176,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Translate UFF unit tests (testUFFForceField.cpp) to Rust**
+Currently working on: **Stage 5 – Implement MolEditor wrapper for rdkit-core::Mol**
