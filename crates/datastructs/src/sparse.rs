@@ -70,6 +70,37 @@ impl SparseBitVect {
         self.size.wrapping_add(self.is_max_size() as u32) - self.num_on_bits()
     }
 
+    /// Number of on bits in common with another sparse vector.
+    pub fn num_on_bits_in_common(&self, other: &Self) -> u32 {
+        assert_eq!(self.size, other.size);
+        self.bits.intersection(&other.bits).count() as u32
+    }
+
+    /// Tanimoto similarity.
+    pub fn tanimoto_similarity(&self, other: &Self) -> f64 {
+        let c = self.num_on_bits_in_common(other) as f64;
+        let a = self.num_on_bits() as f64;
+        let b = other.num_on_bits() as f64;
+        if (a + b - c).abs() < f64::EPSILON {
+            0.0
+        } else {
+            c / (a + b - c)
+        }
+    }
+
+    /// Fold the vector by a power-of-two factor, combining bits with OR.
+    pub fn fold(&self, factor: u32) -> Self {
+        assert!(factor.is_power_of_two());
+        assert_eq!(self.size % factor, 0);
+        let new_size = self.size / factor;
+        let mut folded = SparseBitVect::new(new_size);
+        for &idx in &self.bits {
+            let new_idx = idx % new_size;
+            folded.bits.insert(new_idx);
+        }
+        folded
+    }
+
     /// Return iterator of set-bit indices.
     pub fn on_bits(&self) -> impl Iterator<Item = u32> + '_ {
         self.bits.iter().copied()
@@ -175,6 +206,31 @@ impl Not for &SparseBitVect {
     }
 }
 
+// Indexing operator: sbv[idx]
+
+use std::ops::Index;
+
+const TRUE_VAL: bool = true;
+const FALSE_VAL: bool = false;
+
+impl Index<u32> for SparseBitVect {
+    type Output = bool;
+    fn index(&self, idx: u32) -> &Self::Output {
+        if self.get_bit(idx) {
+            &TRUE_VAL
+        } else {
+            &FALSE_VAL
+        }
+    }
+}
+
+impl Index<usize> for SparseBitVect {
+    type Output = bool;
+    fn index(&self, idx: usize) -> &Self::Output {
+        self.index(idx as u32)
+    }
+}
+
 // -------------------------------------------------------------------------
 // Unit tests ---------------------------------------------------------------
 
@@ -191,5 +247,29 @@ mod tests {
         assert!(!bv.set_bit(max));
         assert!(bv.get_bit(max));
         assert_eq!(bv.num_on_bits(), 1);
+    }
+
+    #[test]
+    fn bit_common_and_tanimoto() {
+        let mut a = SparseBitVect::new(64);
+        a.set_bit(1);
+        a.set_bit(3);
+        let mut b = SparseBitVect::new(64);
+        b.set_bit(3);
+        b.set_bit(4);
+        assert_eq!(a.num_on_bits_in_common(&b), 1);
+        let tanimoto = a.tanimoto_similarity(&b);
+        assert!((tanimoto - 1.0 / 3.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn fold_vector() {
+        let mut v = SparseBitVect::new(32);
+        v.set_bit(1);
+        v.set_bit(17);
+        let folded = v.fold(2);
+        assert_eq!(folded.num_bits(), 16);
+        assert_eq!(folded.num_on_bits(), 1);
+        assert!(folded.get_bit(1));
     }
 }

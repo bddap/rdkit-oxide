@@ -119,7 +119,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 # New implementation milestones ------------------------------------------------
 
 - [ ] Datastructs crate – feature parity with C++
-  - [ ] Complete SparseBitVect API and translate associated tests.
+  - [x] Complete SparseBitVect API and translate associated tests (commit <pending>).
   - [ ] Port RealValueVect and DiscreteValueVect, incl. serialisation.
   - [ ] Implement FPB fingerprint binary reader (streaming, memory-mapped).
 
@@ -154,4 +154,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Complete SparseBitVect API in datastructs crate**
+Currently working on: **Stage 5 – Port RealValueVect and DiscreteValueVect**
