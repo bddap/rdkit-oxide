@@ -175,4 +175,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Integrate default charge assignment into ForceField builder utilities**
+Currently working on: **Stage 5 – Translate UFF unit tests (testUFFForceField.cpp) to Rust**

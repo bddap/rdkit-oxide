@@ -674,6 +674,14 @@ impl ForceField {
         }
     }
 
+    /// Convenience helper (tests only): translate atom coordinate by (dx,dy,dz).
+    pub fn translate_atom(&mut self, idx: usize, dx: f64, dy: f64, dz: f64) {
+        let a = &mut self.atoms[idx];
+        a.coord.0 += dx;
+        a.coord.1 += dy;
+        a.coord.2 += dz;
+    }
+
     // -------------------------------------------------------------------
     // Gradient aggregation ------------------------------------------------
 
