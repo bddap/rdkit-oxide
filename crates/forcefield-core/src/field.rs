@@ -1169,8 +1169,9 @@ impl ForceField {
         self.atoms.len()
     }
 
-    /// Mutable access to a specific atom by index.  Panics if out of bounds –
-    /// optimisation code should ensure valid indices.
+    /// Mutable access to a specific atom by index.  Used primarily by unit
+    /// tests and optimisation helpers.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub(crate) fn get_atom_mut(&mut self, idx: usize) -> &mut Atom {
         &mut self.atoms[idx]
     }
