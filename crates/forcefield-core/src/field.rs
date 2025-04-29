@@ -287,6 +287,72 @@ mod tests {
             assert_relative_eq!(ga.2, gf.2, epsilon = 2e-4);
         }
     }
+
+    #[test]
+    fn lj_gradient_matches_fd() {
+        // Two argon-like atoms interacting via Lennard-Jones only.
+        let mut ff = ForceField::default();
+
+        let a = ff.add_atom("Ar", Point3D(0.0, 0.0, 0.0));
+        let b = ff.add_atom("Ar", Point3D(4.0, 0.0, 0.0));
+
+        let epsilon = 0.238; // kcal/mol
+        let sigma = 3.405;
+        ff.add_lj_pair(a, b, epsilon, sigma);
+
+        let g_ana = ff.lj_gradients();
+
+        // Finite-difference helper --------------------------------------------------
+        fn numerical_grad(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<Point3D>> {
+            enum Axis { X, Y, Z }
+
+            fn coord_mut<'a>(p: &'a mut Point3D, axis: &Axis) -> &'a mut f64 {
+                match axis {
+                    Axis::X => &mut p.0,
+                    Axis::Y => &mut p.1,
+                    Axis::Z => &mut p.2,
+                }
+            }
+
+            fn fd_comp(ff: &mut ForceField, atom_idx: usize, axis: Axis, h: f64) -> rdkit_core::Result<f64> {
+                let orig;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    orig = *coord;
+                    *coord = orig + h;
+                }
+                let e_plus = ff.total_energy()?;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig - h;
+                }
+                let e_minus = ff.total_energy()?;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig;
+                }
+                Ok((e_plus - e_minus) / (2.0 * h))
+            }
+
+            let natoms = ff.atom_count();
+            let mut grad = Vec::with_capacity(natoms);
+            for idx in 0..natoms {
+                let gx = fd_comp(ff, idx, Axis::X, h)?;
+                let gy = fd_comp(ff, idx, Axis::Y, h)?;
+                let gz = fd_comp(ff, idx, Axis::Z, h)?;
+                grad.push(Point3D(gx, gy, gz));
+            }
+            Ok(grad)
+        }
+
+        let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
+
+        for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
+            assert_relative_eq!(ga.0, gf.0, epsilon = 1e-3);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 1e-3);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
+        }
+    }
 }
 
 
@@ -458,7 +524,51 @@ impl ForceField {
             total.2 += g.2;
         }
 
+        // Lennard-Jones term --------------------------------------------
+        let lj_grad = self.lj_gradients();
+        for (total, g) in grad.iter_mut().zip(lj_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
         Ok(grad)
+    }
+
+    /// Analytic gradients for Lennard-Jones 12-6 non-bonded pairs.
+    pub fn lj_gradients(&self) -> Vec<geometry::Point3D> {
+        use geometry::{Point3D, Vector3D};
+
+        let mut grad = vec![Point3D(0.0, 0.0, 0.0); self.atom_count()];
+
+        for pair in &self.lj_pairs {
+            let a_idx = pair.a.0;
+            let b_idx = pair.b.0;
+
+            let coord_a = self.atoms[a_idx].coord;
+            let coord_b = self.atoms[b_idx].coord;
+
+            let r_vec: Vector3D = coord_a - coord_b;
+            let r = r_vec.norm();
+            if r < 1e-12 {
+                continue; // overlapping atoms, skip
+            }
+
+            let d_edr = crate::lj_energy_derivative(pair.epsilon, pair.sigma, r);
+
+            let u = r_vec / r;
+            let g = u * d_edr;
+
+            grad[a_idx].0 += g.x();
+            grad[a_idx].1 += g.y();
+            grad[a_idx].2 += g.z();
+
+            grad[b_idx].0 -= g.x();
+            grad[b_idx].1 -= g.y();
+            grad[b_idx].2 -= g.z();
+        }
+
+        grad
     }
 
     // -------------------------------------------------------------------

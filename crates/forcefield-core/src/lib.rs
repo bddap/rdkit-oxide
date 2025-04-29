@@ -324,7 +324,7 @@ pub fn lj_energy(epsilon: f64, sigma: f64, r: f64) -> f64 {
 pub fn lj_energy_derivative(epsilon: f64, sigma: f64, r: f64) -> f64 {
     let sr6 = (sigma / r).powi(6);
     // d/dr E = 4 ε [ -12 σ¹² / r¹³ + 6 σ⁶ / r⁷ ]
-    24.0 * epsilon / r * (2.0 * sr6 * sr6 - sr6)
+    24.0 * epsilon / r * (-2.0 * sr6 * sr6 + sr6)
 }
 
 // ---------------------------------------------------------------------------
