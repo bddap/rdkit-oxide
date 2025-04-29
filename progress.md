@@ -28,8 +28,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Depictor (legacy-rdkit-map/GraphMol_Depictor.md)
     - [x] Stereochemistry & CIPLabeler (legacy-rdkit-map/GraphMol_Stereo.md)
     - [x] FilterCatalog (legacy-rdkit-map/GraphMol_FilterCatalog.md)
-    - [ ] FMCS
-    - [ ] DistGeomHelpers & ForceFieldHelpers
+    - [x] FMCS (legacy-rdkit-map/GraphMol_FMCS.md)
+    - [x] DistGeomHelpers (legacy-rdkit-map/GraphMol_DistGeomHelpers.md)
+    - [ ] ForceFieldHelpers
   - [-] JavaWrappers (skip – no Rust port)
   - [ ] ML
   - [-] MinimalLib (skip – wasm viewer only)
@@ -63,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` FMCS.”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` ForceFieldHelpers.”**
