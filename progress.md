@@ -36,7 +36,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [-] MinimalLib (skip – wasm viewer only)
   - [x] Numerics (legacy-rdkit-map/Numerics.md)
   - [-] PgSQL (skip – no Rust port)
-  - [ ] Query
+  - [x] Query (legacy-rdkit-map/Query.md)
   - [-] RDBoost (skip – no Rust port)
   - [ ] RDGeneral
   - [ ] RDStreams
@@ -64,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for Query.”**
+Currently working on: **“Stage 2 – Detailed map for RDGeneral.”**
