@@ -4,6 +4,8 @@ use bitvec::prelude::*;
 use base64::prelude::*; // re-export traits for encode/decode
 
 pub mod sparse;
+pub mod real;
+pub mod discrete;
 
 
 /// Count bits set in a u64 (popcount).
