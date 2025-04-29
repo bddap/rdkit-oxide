@@ -48,7 +48,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
   - [x] RDGeneral tests (legacy-rdkit-map/tests.md)
-  - [ ] DataStructs tests
+  - [x] DataStructs tests (legacy-rdkit-map/tests.md)
   - [ ] Geometry & DistGeom tests
   - [ ] ForceField tests
   - [ ] GraphMol core + submodules tests
@@ -72,4 +72,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – DataStructs tests catalogue.”**
+Currently working on: **“Stage 2.5 – Geometry & DistGeom tests catalogue.”**

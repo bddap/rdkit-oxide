@@ -24,3 +24,21 @@ tests to Rust.
 ------------------------------------------------------------------------------
 
 Pending sections: DataStructs, Geometry/DistGeom, ForceField, GraphMol, SimDivPickers, Numerics, Misc.
+
+------------------------------------------------------------------------------
+
+## DataStructs
+
+| File | Key tests (line) | Purpose |
+|------|------------------|---------|
+| `DataStructs/catch_tests.cpp` | `TEST_CASE("special cases for the limits of sparse vectors", 17)` | Regression for 32-bit overflow in `SparseBitVect` when size==UINT_MAX. Ensures `setBit`/`getBit` behave at numeric limits. |
+| `DataStructs/testDatastructs.cpp` | Functions `Test<ExplicitBitVect>()`, `Test<SparseBitVect>()` (≈40-240) – generic bit-vector CRUD, logical ops, streaming round-trip.<br>`testBase64()` (~310) – verify base64 encode/decode of pickled vectors.<br>`testDiscreteValueVect()` (~420) – integer vector math, distance, serialization.<br>`testRealValueVect()` (~580) – floating-point vector math with tolerance.<br>Main() runs all and reports via RDLog. | Comprehensive legacy test covering *all* vector types, base64 helpers, and exception handling. |
+| `DataStructs/testFPB.cpp` | `TEST_CASE("FPB reader basic", 25)` – load `.fpb` file (`test1.bin`) and query popcount/dim.<br>`TEST_CASE("FPB sub-byte bits", 70)` – regression for bit count not multiple of 8. | Validates fixed-binary fingerprint container format and random access. |
+| `DataStructs/testMultiFPB.cpp` | `TEST_CASE("multi‐reader iterate", 23)` – iterate over multiple FPB shards.<br>`TEST_CASE("multi‐reader hasIndex", 56)` – lookups by fp index and pattern id. | Tests `MultiFPBReader` aggregation layer. |
+| `DataStructs/Wrap/testBV.py` | `TestPickle`, `TestBitMath` classes – Python wrapper round-trip and operator overloads. |
+| `DataStructs/Wrap/testDiscreteValueVect.py` | `TestDVV` – sum, scalar mult, chi-square distance via SWIG interface. |
+| `DataStructs/Wrap/testRealValueVect.py` | `TestRVV` – same for real-valued vectors. |
+| `DataStructs/Wrap/testFPB.py` | `TestFPBReader` – ensure Python API sees same fingerprints/metadata as C++. |
+
+------------------------------------------------------------------------------
+
