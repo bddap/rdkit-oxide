@@ -25,7 +25,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Descriptors (legacy-rdkit-map/GraphMol_Descriptors.md)
     - [x] Substructure search (legacy-rdkit-map/GraphMol_Substructure.md)
     - [x] Reaction chemistry (legacy-rdkit-map/GraphMol_Reaction.md)
-    - [ ] Depictor
+    - [x] Depictor (legacy-rdkit-map/GraphMol_Depictor.md)
     - [ ] Stereochemistry & CIPLabeler
     - [ ] FilterCatalog
     - [ ] FMCS
@@ -63,4 +63,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` Depictor.”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` Stereochemistry & CIPLabeler.”**
