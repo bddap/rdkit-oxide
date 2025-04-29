@@ -108,10 +108,13 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] Add simple unit-test (H_ sanity check)
  - [x] Expose API for bond-stretch & angle-bend energy calculations
    - [x] Implement core formulas in new crate `forcefield-core` (+ unit tests) – `bond_rest_length`, `bond_stretch_energy`, `angle_force_constant`, `angle_bend_energy` (commit <pending>)
- - [ ] Document workspace `README.md`
+ - [x] Document workspace `README.md`
    - [ ] Explain crate layout & build instructions.
    - [ ] Describe code-generation (UFF parameters via build.rs).
    - [ ] Provide quickstart code snippet (compute energy of water).
+   - [x] Implemented initial README with layout, build instructions, quickstart (commit <pending>).
+ - [x] Scaffold geometry crate with Point3D
+   - [x] geometry crate created with Point3D, vector ops, unit tests (commit <pending>).
 
 # New implementation milestones ------------------------------------------------
 
@@ -151,4 +154,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Document workspace `README.md`**
+Currently working on: **Stage 5 – Complete SparseBitVect API in datastructs crate**

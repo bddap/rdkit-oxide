@@ -1,0 +1,17 @@
+[package]
+name = "geometry"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nalgebra = { version = "0.32", default-features = false, features = ["std"] }
+serde = { version = "1", features = ["derive"], optional = true }
+
+[features]
+serde = ["dep:serde", "nalgebra/serde-serialize"]
+
+[dev-dependencies]
+approx = "0.5"
+
+[lib]
+path = "src/lib.rs"
