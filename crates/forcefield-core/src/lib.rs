@@ -12,6 +12,7 @@ use forcefield_uff as uff;
 use rdkit_core::{invariant, RdError, Result};
 
 pub mod field;
+pub mod optim;
 
 
 // ---------------------------------------------------------------------------

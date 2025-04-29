@@ -134,9 +134,11 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
   - [x] Aggregate ForceField struct storing particles & computing total energy (crates/forcefield-core/field.rs).
 
-- [ ] Minimisation / optimisation engine
-  - [ ] Implement steepest-descent and conjugate-gradient algorithms (or integrate `argmin` crate).
-  - [ ] Provide `optimize_geometry()` helper that minimises energy until gradient RMS < threshold.
+  - [ ] Minimisation / optimisation engine
+    - [x] Scaffold SDParams and steepest_descent placeholder (crates/forcefield-core/optim.rs).
+    - [ ] Flesh out gradient calculation and update coordinates.
+    - [ ] Add conjugate-gradient or integrate `argmin` crate.
+    - [ ] Provide `optimize_geometry()` helper.
 
 - [ ] Unit-test translation – ForceField/UFF
   - [ ] Port `testUFFForceField.cpp` (bond, angle, torsion, vdW) to Rust.
