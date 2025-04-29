@@ -137,6 +137,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Analytic per-atom gradient for Lennard-Jones terms (crates/forcefield-core/field.rs).
   - [x] Analytic per-atom gradient for inversion (improper torsion) terms (crates/forcefield-core/field.rs).
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
+  - [x] Coulomb term energy + analytic gradient (crates/forcefield-core).
   - [x] Aggregate ForceField struct storing particles & computing total energy (crates/forcefield-core/field.rs).
 
   - [ ] Minimisation / optimisation engine
@@ -174,4 +175,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Integrate analytic gradients into ForceField optimiser (remove numerical fallback)**
+Currently working on: **Stage 5 – Port UFF parameter-driven charge assignment helper (optional)**

@@ -420,6 +420,65 @@ mod tests {
             assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
         }
     }
+
+    #[test]
+    fn coulomb_gradient_matches_fd() {
+        // Two point charges +1e and -1e separated by 5 Å.
+        let mut ff = ForceField::default();
+        let a = ff.add_atom("X", Point3D(0.0, 0.0, 0.0));
+        let b = ff.add_atom("Y", Point3D(5.0, 0.0, 0.0));
+
+        ff.add_coulomb_pair(a, b, 1.0, -1.0);
+
+        let g_ana = ff.coulomb_gradients();
+
+        // Numerical finite difference.
+        fn numerical_grad(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<Point3D>> {
+            enum Axis { X, Y, Z }
+            fn coord_mut<'a>(p: &'a mut Point3D, axis: &Axis) -> &'a mut f64 {
+                match axis {
+                    Axis::X => &mut p.0,
+                    Axis::Y => &mut p.1,
+                    Axis::Z => &mut p.2,
+                }
+            }
+            fn fd(ff: &mut ForceField, idx: usize, axis: Axis, h: f64) -> rdkit_core::Result<f64> {
+                let orig;
+                {
+                    let c = coord_mut(&mut ff.get_atom_mut(idx).coord, &axis);
+                    orig = *c;
+                    *c = orig + h;
+                }
+                let e_plus = ff.total_energy()?;
+                {
+                    let c = coord_mut(&mut ff.get_atom_mut(idx).coord, &axis);
+                    *c = orig - h;
+                }
+                let e_minus = ff.total_energy()?;
+                {
+                    let c = coord_mut(&mut ff.get_atom_mut(idx).coord, &axis);
+                    *c = orig;
+                }
+                Ok((e_plus - e_minus) / (2.0 * h))
+            }
+            let mut g = Vec::new();
+            for idx in 0..ff.atom_count() {
+                let gx = fd(ff, idx, Axis::X, h)?;
+                let gy = fd(ff, idx, Axis::Y, h)?;
+                let gz = fd(ff, idx, Axis::Z, h)?;
+                g.push(Point3D(gx, gy, gz));
+            }
+            Ok(g)
+        }
+
+        let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
+
+        for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
+            assert_relative_eq!(ga.0, gf.0, epsilon = 1e-3);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 1e-3);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
+        }
+    }
 }
 
 
@@ -470,6 +529,14 @@ pub struct LjPair {
     sigma: f64,
 }
 
+#[derive(Debug, Clone)]
+pub struct CoulombPair {
+    a: AtomIdx,
+    b: AtomIdx,
+    q_a: f64,
+    q_b: f64,
+}
+
 /// Main container.
 #[derive(Default)]
 pub struct ForceField {
@@ -479,6 +546,8 @@ pub struct ForceField {
     torsions: Vec<Torsion>,
     inversions: Vec<Inversion>,
     lj_pairs: Vec<LjPair>,
+
+    coulomb_pairs: Vec<CoulombPair>,
 }
 
 impl ForceField {
@@ -551,6 +620,10 @@ impl ForceField {
         self.lj_pairs.push(LjPair { a, b, epsilon, sigma });
     }
 
+    pub fn add_coulomb_pair(&mut self, a: AtomIdx, b: AtomIdx, q_a: f64, q_b: f64) {
+        self.coulomb_pairs.push(CoulombPair { a, b, q_a, q_b });
+    }
+
     // -------------------------------------------------------------------
     // Gradient aggregation ------------------------------------------------
 
@@ -602,6 +675,14 @@ impl ForceField {
         // Inversion term -------------------------------------------------
         let inv_grad = self.inversion_gradients();
         for (total, g) in grad.iter_mut().zip(inv_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
+        // Coulomb term ----------------------------------------------------
+        let q_grad = self.coulomb_gradients();
+        for (total, g) in grad.iter_mut().zip(q_grad.iter()) {
             total.0 += g.0;
             total.1 += g.1;
             total.2 += g.2;
@@ -753,6 +834,36 @@ impl ForceField {
             grad[j_idx].0 -= d_e_dw * (tg1.x() + tg3.x() + tg4.x());
             grad[j_idx].1 -= d_e_dw * (tg1.y() + tg3.y() + tg4.y());
             grad[j_idx].2 -= d_e_dw * (tg1.z() + tg3.z() + tg4.z());
+        }
+
+        grad
+    }
+
+    /// Analytic gradients for Coulomb pairs.
+    pub fn coulomb_gradients(&self) -> Vec<geometry::Point3D> {
+        use geometry::{Point3D, Vector3D};
+
+        let mut grad = vec![Point3D(0.0, 0.0, 0.0); self.atom_count()];
+        for pair in &self.coulomb_pairs {
+            let a_idx = pair.a.0;
+            let b_idx = pair.b.0;
+            let pa = self.atoms[a_idx].coord;
+            let pb = self.atoms[b_idx].coord;
+            let r_vec: Vector3D = pa - pb;
+            let r = r_vec.norm();
+            if r < 1e-12 {
+                continue;
+            }
+            let d_edr = crate::coulomb_energy_derivative(pair.q_a, pair.q_b, r);
+            let g_vec = r_vec / r * d_edr; // vector
+
+            grad[a_idx].0 += g_vec.x();
+            grad[a_idx].1 += g_vec.y();
+            grad[a_idx].2 += g_vec.z();
+
+            grad[b_idx].0 -= g_vec.x();
+            grad[b_idx].1 -= g_vec.y();
+            grad[b_idx].2 -= g_vec.z();
         }
 
         grad
@@ -1125,6 +1236,14 @@ impl ForceField {
             let b = &self.atoms[pair.b.0];
             let r = a.coord.distance(b.coord);
             e += lj_energy(pair.epsilon, pair.sigma, r);
+        }
+
+        // Coulomb
+        for pair in &self.coulomb_pairs {
+            let a = &self.atoms[pair.a.0];
+            let b = &self.atoms[pair.b.0];
+            let r = a.coord.distance(b.coord);
+            e += crate::coulomb_energy(pair.q_a, pair.q_b, r);
         }
 
         Ok(e)

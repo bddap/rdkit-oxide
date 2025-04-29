@@ -328,6 +328,27 @@ pub fn lj_energy_derivative(epsilon: f64, sigma: f64, r: f64) -> f64 {
 }
 
 // ---------------------------------------------------------------------------
+// Public API – Electrostatic Coulomb term
+// ---------------------------------------------------------------------------
+
+/// Vacuum electrostatic constant (kcal·Å / mol·e²).  In AMBER and UFF this is
+/// usually quoted as 332.06371.
+const K_ELEC: f64 = 332.06371;
+
+/// Coulomb interaction energy between point charges `q_i`, `q_j` separated by
+/// distance `r` (Å).  Returns energy in kcal/mol.
+#[inline]
+pub fn coulomb_energy(q_i: f64, q_j: f64, r: f64) -> f64 {
+    K_ELEC * q_i * q_j / r
+}
+
+/// Derivative ∂E/∂r (kcal mol⁻¹ Å⁻¹).
+#[inline]
+pub fn coulomb_energy_derivative(q_i: f64, q_j: f64, r: f64) -> f64 {
+    -K_ELEC * q_i * q_j / (r * r)
+}
+
+// ---------------------------------------------------------------------------
 // Unit tests – basic sanity checks versus reference C++ values
 // ---------------------------------------------------------------------------
 
