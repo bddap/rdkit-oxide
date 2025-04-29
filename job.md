@@ -1,3 +1,5 @@
+Read this entire doc before starting.
+
 # Stage 1. High-Level Planning/Root Summary
 
 I'd like you to create a detailed summary of the entire rdkit source (located in ./rdkit). The summary should serve as a map explaining every module, file, class, nook, and cranny of rdkit.
@@ -49,7 +51,7 @@ This is a large codebase. You’ll need to be careful not to bite off more than 
 
 Always run clippy and all tests before committing. Don’t commit with broken tests or unresolved lints. (Hint: use the -q option in tests to save on context consumption.)
 
-Every test from Stage 2.5 must be translated to Rust (with any rare exceptions going into “the list of shame,” ./shame.md). Remember that Rust has slightly different idioms for test location.
+Every test from Stage 2.5 must be translated to Rust (with any rare exceptions going into “the list of shame,” ./shame.md). Remember that Rust has slightly different idioms for test location. Skipped tests are not allowed.
 
 You can always use your notes from previous steps, e.g. Stage 2 and Stage 3.
 
@@ -71,9 +73,13 @@ You are responsible for inserting to-dos and sub-to-dos into ./progress.md, and 
 In the last line of ./progress.md, track what you are currently working on. When you finish a task:
 
 - Double-check your deliverable to ensure the task is complete.
-- Commit each change, ensure your working dir doesn't have uncommited changes
 - Mark the task as done in ./progress.md.
-- Replace the last line of ./progress.md with your next task.
-- *Do not* report back or speak to the user until all stages are complete.
+- Pick your next task and replace the last line of ./progress.md with your next task.
+- Commit each change, ensure your working dir doesn't have uncommited changes
+- *Do not* report back or speak to the user unless you are stuck and need help.
+
+Work in a continous loop, once one task is complete, pick up the next one. Add new tasks to ./progress.md as needed. Update design docs as needed.
+
+./progress.md is your garden, keep it pretty, ordered, and up-to date.
 
 I’ll be watching ./progress.md
