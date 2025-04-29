@@ -1,4 +1,4 @@
-Read this entire doc before starting.
+Read this entire doc before starting. See ./progress.md to recover your own notes.
 
 # Stage 1. High-Level Planning/Root Summary
 
