@@ -86,17 +86,20 @@ impl<'a> Iterator for Lexer<'a> {
                 Tok::BracketAtom(&self.src[start..self.pos - 1])
             }
 
-            // Elements / aromatic symbols --------------------------------
-            'B' | 'C' | 'N' | 'O' | 'P' | 'S' | 'F' | 'I' => {
+            // Elements (standard): uppercase + optional lowercase letter
+            'A'..='Z' => {
                 let start = self.pos - c.len_utf8();
-                // optional second char (l,r) for Cl/Br
-                if (c == 'C' && matches!(self.peek(), Some('l'))) || (c == 'B' && matches!(self.peek(), Some('r'))) {
+                if matches!(self.peek(), Some('a'..='z')) {
                     self.bump();
                 }
                 Tok::Element(&self.src[start..self.pos])
             }
 
-            'c' | 'n' | 'o' | 's' | '*' => Tok::Element(&self.src[self.pos - 1..self.pos]),
+            // Aromatic single-letter lower-case atoms -------------------
+            'c' | 'n' | 'o' | 's' | 'p' | 'b' => Tok::Element(&self.src[self.pos - 1..self.pos]),
+
+            // Dot separator between disconnected components -------------
+            '.' => Tok::Bond('.'),
 
             _ => return None, // invalid char – for brevity
         })
@@ -127,6 +130,22 @@ mod tests {
         let toks: Vec<_> = Lexer::new("C-%12CCCC%12").collect();
         // Expect first Ring token carries '-' bond and idx 12
         assert!(matches!(toks[1], Tok::Ring(12, Some('-'))));
+    }
+
+    #[test]
+    fn multi_letter_elements_and_dot() {
+        let smiles = "Na.ClSiBrCl";
+        let toks: Vec<_> = Lexer::new(smiles).collect();
+        // Expect sequence: Na . Cl Si Br Cl
+        let expected = [
+            "Na", ".", "Cl", "Si", "Br", "Cl"
+        ];
+        let elems: Vec<&str> = toks.into_iter().filter_map(|t| match t {
+            Tok::Element(sym) => Some(sym),
+            Tok::Bond('.') => Some("."),
+            _ => None,
+        }).collect();
+        assert_eq!(elems, expected);
     }
 
     #[test]
