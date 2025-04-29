@@ -149,6 +149,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 - [ ] Unit-test translation – ForceField/UFF
   - [ ] Port `testUFFForceField.cpp` (bond, angle, torsion, vdW) to Rust.
   - [ ] Regression tests on methane, water, benzene geometries versus C++ energies.
+    - [ ] Re-enable methane optimisation energy test once missing terms implemented (see shame.md).
 
 - [ ] GraphMol core datastructs (upcoming major set)
   - [ ] Atom, Bond enums / structs with properties.
