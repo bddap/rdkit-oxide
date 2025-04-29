@@ -255,6 +255,25 @@ mod tests {
     }
 
     #[test]
+    fn fold_by_power_of_two_multiple() {
+        let mut v = ExplicitBitVect::new(64);
+        // set bits spaced 16 apart so that after folding by 4 they collide.
+        v.set_bit(1);
+        v.set_bit(17);
+        v.set_bit(33);
+        v.set_bit(49);
+
+        // Before folding we have 4 bits
+        assert_eq!(v.num_on_bits(), 4);
+
+        let folded = v.fold(4);
+        assert_eq!(folded.len(), 16);
+        // OR semantics -> all these map to index 1
+        assert_eq!(folded.num_on_bits(), 1);
+        assert!(folded.get_bit(1));
+    }
+
+    #[test]
     fn explicit_full_api_basics() {
         let mut bv = ExplicitBitVect::new(32);
         assert_eq!(bv.num_bits(), 32);
