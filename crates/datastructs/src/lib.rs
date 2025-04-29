@@ -15,9 +15,24 @@ pub fn count_bits(buf: &[u8]) -> u32 {
 }
 
 /// Explicit (dense) bit vector.
+#[derive(Debug)]
 pub struct ExplicitBitVect {
     bits: BitVec<u8, Lsb0>,
 }
+
+impl Clone for ExplicitBitVect {
+    fn clone(&self) -> Self {
+        Self { bits: self.bits.clone() }
+    }
+}
+
+impl PartialEq for ExplicitBitVect {
+    fn eq(&self, other: &Self) -> bool {
+        self.bits == other.bits
+    }
+}
+
+impl Eq for ExplicitBitVect {}
 
 impl ExplicitBitVect {
     /// Create a new bit vector of given length, all zeros.
@@ -40,6 +55,37 @@ impl ExplicitBitVect {
             .get(idx)
             .map(|bit| *bit)
             .unwrap_or(false)
+    }
+
+    /// Clear (unset) a bit. Returns previous value.
+    pub fn unset_bit(&mut self, idx: usize) -> bool {
+        if idx >= self.len() {
+            return false;
+        }
+        let prev = self.bits[idx];
+        if prev {
+            self.bits.set(idx, false);
+        }
+        prev
+    }
+
+    /// Total length (alias for `len`).
+    pub fn num_bits(&self) -> usize {
+        self.len()
+    }
+
+    /// Number of bits that are zero.
+    pub fn num_off_bits(&self) -> u32 {
+        (self.len() as u32) - self.num_on_bits()
+    }
+
+    /// Return indices of all bits that are set.
+    pub fn get_on_bits(&self) -> Vec<usize> {
+        self.bits
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, bit)| if *bit { Some(idx) } else { None })
+            .collect()
     }
 
     pub fn num_on_bits(&self) -> u32 {
@@ -120,6 +166,39 @@ impl ExplicitBitVect {
     }
 }
 
+// --- operator traits -------------------------------------------------------
+
+use std::ops::{BitAnd, BitOr, BitXor, Not};
+
+impl<'a, 'b> BitOr<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+    type Output = ExplicitBitVect;
+    fn bitor(self, rhs: &'b ExplicitBitVect) -> Self::Output {
+        self.bit_or(rhs)
+    }
+}
+
+impl<'a, 'b> BitAnd<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+    type Output = ExplicitBitVect;
+    fn bitand(self, rhs: &'b ExplicitBitVect) -> Self::Output {
+        self.bit_and(rhs)
+    }
+}
+
+impl<'a, 'b> BitXor<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+    type Output = ExplicitBitVect;
+    fn bitxor(self, rhs: &'b ExplicitBitVect) -> Self::Output {
+        self.bit_xor(rhs)
+    }
+}
+
+impl<'a> Not for &'a ExplicitBitVect {
+    type Output = ExplicitBitVect;
+    fn not(self) -> Self::Output {
+        let bits = self.bits.iter().map(|b| !*b).collect();
+        ExplicitBitVect { bits }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -171,5 +250,46 @@ mod tests {
         assert!(folded.get_bit(1));
         assert!(folded.get_bit(3));
         assert!(folded.get_bit(4));
+    }
+
+    #[test]
+    fn explicit_full_api_basics() {
+        let mut bv = ExplicitBitVect::new(32);
+        assert_eq!(bv.num_bits(), 32);
+        assert_eq!(bv.num_on_bits(), 0);
+        assert_eq!(bv.num_off_bits(), 32);
+
+        // set/unset operations
+        bv.set_bit(10);
+        bv.set_bit(11);
+        bv.set_bit(14);
+        assert!(bv.get_bit(10));
+        assert!(bv.get_bit(11));
+        assert!(bv.get_bit(14));
+        assert_eq!(bv.num_on_bits(), 3);
+
+        // unset returns previous value
+        assert!(bv.unset_bit(14));
+        assert!(!bv.get_bit(14));
+        assert_eq!(bv.num_on_bits(), 2);
+
+        // bit vector equality
+        let mut bv2 = bv.clone();
+        assert_eq!(bv, bv2);
+        bv2.set_bit(31);
+        assert_ne!(bv, bv2);
+
+        // get_on_bits list
+        let on = bv.get_on_bits();
+        assert_eq!(on, vec![10, 11]);
+
+        // bitwise not
+        let complement = !&bv;
+        assert!(!complement.get_bit(10));
+        assert!(complement.get_bit(14));
+        assert_eq!(complement.num_on_bits(), 32 - 2);
+
+        // Tanimoto similarity self
+        assert!((bv.tanimoto_similarity(&bv2) - (2.0 / (3.0))).abs() < 1e-6);
     }
 }
