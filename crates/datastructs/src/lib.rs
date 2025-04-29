@@ -2,6 +2,8 @@
 
 use bitvec::prelude::*;
 
+pub mod sparse;
+
 
 /// Count bits set in a u64 (popcount).
 #[inline]
