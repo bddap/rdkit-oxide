@@ -59,10 +59,10 @@ rdkit uses some external dependencies. You may find you need to reimplement thos
 
 Remember, if things get out of hand, git can take you back to a known-good state.
 
-# Competion
+# Completion
 
 You are under no time-constraints. Go deep, complete the job completely and correctly, it's ok for this to take months.
-Your context will be automatically compacted as required. Messages to the user will go unread.
+Your context will be automatically compacted as required. Do not speak to the user unless stage 5 is complete. Only call functions.
 Systematically complete each stage and todo before reporting back to the user.
 
 # Tracking Your Progress
@@ -76,7 +76,7 @@ In the last line of ./progress.md, track what you are currently working on. When
 - Mark the task as done in ./progress.md.
 - Pick your next task and replace the last line of ./progress.md with your next task.
 - Commit each change, ensure your working dir doesn't have uncommited changes
-- *Do not* report back or speak to the user unless you are stuck and need help.
+- *Do not* report back or speak to the user unless you are stuck and need help. Stay quiet, function calls only.
 
 Work in a continous loop, once one task is complete, pick up the next one. Add new tasks to ./progress.md as needed. Update design docs as needed.
 
