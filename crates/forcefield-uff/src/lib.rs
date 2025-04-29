@@ -16,6 +16,10 @@ pub fn get(label: &str) -> Option<AtomParams> {
     PARAMS.get(label).copied()
 }
 
+/// Default partial charges table (see [`charge::get`]).  Only populated for a
+/// subset of common labels.
+pub mod charge;
+
 #[cfg(test)]
 mod tests {
     use super::*;
