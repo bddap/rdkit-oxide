@@ -21,7 +21,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] GraphMol (legacy-rdkit-map/GraphMol.md)
     - [x] Core Atom/Bond/ROMol (legacy-rdkit-map/GraphMol_Core.md)
     - [x] FileParsers (legacy-rdkit-map/GraphMol_FileParsers.md)
-    - [ ] Fingerprints
+    - [x] Fingerprints (legacy-rdkit-map/GraphMol_Fingerprints.md)
     - [ ] Descriptors
     - [ ] Substructure search
     - [ ] Reaction chemistry
@@ -63,4 +63,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` Fingerprints.”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` Descriptors.”**
