@@ -99,8 +99,12 @@ This file is updated incrementally to survive context compression.  Each top-lev
  - [x] Translate first Catch2 datastructs tests to Rust (SparseBitVect limit case, base64 round-trip)
  - [x] Resolve clippy nits in datastructs crate (base64 deprecation, needless lifetimes, len/is_empty, tests bool assert)
  - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
+   - [x] Implement build-time extraction of UFF parameters into new crate `forcefield-uff` (commit <pending>)
+   - [x] Auto-generate const parameter map via phf; clippy clean
+   - [x] Add simple unit-test (H_ sanity check)
+ - [ ] Expose API for bond-stretch & angle-bend energy calculations
  - [ ] Document workspace `README.md`
 
 ---
 
-Currently working on: **Stage 5 – Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)**
+Currently working on: **Stage 5 – Implement bond-stretch & angle-bend energy functions in forcefield-core using generated parameters**
