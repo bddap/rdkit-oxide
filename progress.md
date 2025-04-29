@@ -136,7 +136,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
   - [ ] Minimisation / optimisation engine
     - [x] Scaffold SDParams and steepest_descent placeholder (crates/forcefield-core/optim.rs).
-    - [ ] Flesh out gradient calculation and update coordinates.
+    - [x] Flesh out gradient calculation and update coordinates (steepest descent implemented).
     - [ ] Add conjugate-gradient or integrate `argmin` crate.
     - [ ] Provide `optimize_geometry()` helper.
 
@@ -155,4 +155,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Evaluate `petgraph` or custom graph for molecule.
 
 
-Currently working on: **Stage 5 – Minimisation engine – steepest descent**
+ - [x] Implement numerical gradient + steepest descent optimiser (crates/forcefield-core/optim.rs)
+   - [x] Added central finite-difference gradient, simple backtracking line search, RMS-gradient convergence.
+   - [x] Unit test on distorted water molecule.
+
+Currently working on: **Stage 5 – Minimisation engine – conjugate-gradient / optimisation improvements**

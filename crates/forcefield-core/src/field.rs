@@ -172,6 +172,25 @@ impl ForceField {
         self.lj_pairs.push(LjPair { a, b, epsilon, sigma });
     }
 
+    // -------------------------------------------------------------------
+    // Internal helper accessors (used by optimisation routines)
+
+    /// Mutable slice of atoms – optimisation code may tweak coordinates.
+    pub(crate) fn atoms_mut(&mut self) -> &mut [Atom] {
+        &mut self.atoms
+    }
+
+    /// Number of atoms currently stored.
+    pub(crate) fn atom_count(&self) -> usize {
+        self.atoms.len()
+    }
+
+    /// Mutable access to a specific atom by index.  Panics if out of bounds –
+    /// optimisation code should ensure valid indices.
+    pub(crate) fn get_atom_mut(&mut self, idx: usize) -> &mut Atom {
+        &mut self.atoms[idx]
+    }
+
     /// Compute total potential energy (kcal/mol) as sum of all terms.
     pub fn total_energy(&self) -> Result<f64, rdkit_core::RdError> {
         let mut e = 0.0;
