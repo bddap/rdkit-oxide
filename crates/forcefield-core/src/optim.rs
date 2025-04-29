@@ -24,9 +24,6 @@ impl Default for SDParams {
     }
 }
 
-/// Finite-difference displacement (central, 2-point) used for numerical
-/// gradient evaluation (Å).
-const FD_EPS: f64 = 1.0e-4;
 
 // ---------------------------------------------------------------------------
 // Conjugate-gradient optimiser ----------------------------------------------
@@ -60,15 +57,13 @@ pub fn conjugate_gradient(ff: &mut ForceField, params: CGParams) -> rdkit_core::
 
     // Initial energy and gradient.
     let mut energy = ff.total_energy()?;
-    let mut g_prev = ff
-        .analytic_gradient()
-        .unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
+    let mut g_prev = ff.analytic_gradient()?;
 
     // Initial search direction is the negative gradient.
     let mut dir: Vec<Point3D> = g_prev.iter().map(|p| Point3D(-p.0, -p.1, -p.2)).collect();
 
     for _iter in 0..params.max_iters {
-        // RMS gradient check.
+        // RMS gradient check (analytic gradients only).
         if rms_grad(&g_prev) < params.tol {
             return Ok(energy);
         }
@@ -107,10 +102,8 @@ pub fn conjugate_gradient(ff: &mut ForceField, params: CGParams) -> rdkit_core::
 
         energy = new_energy;
 
-        // Compute new gradient.
-        let g_curr = ff
-            .analytic_gradient()
-            .unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
+        // Compute new analytic gradient.
+        let g_curr = ff.analytic_gradient()?;
 
         // Polak–Ribiere β = g_k · (g_k − g_{k-1}) / (g_{k-1} · g_{k-1})
         let gg = grad_dot(&g_prev, &g_prev);
@@ -176,8 +169,8 @@ pub fn steepest_descent(ff: &mut ForceField, params: SDParams) -> rdkit_core::Re
     let mut energy = ff.total_energy()?;
 
     for _iter in 0..params.max_iters {
-        // Prefer analytic gradient when available.
-        let grad = ff.analytic_gradient().unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
+        // Analytic gradient (all terms implemented currently).
+        let grad = ff.analytic_gradient()?;
 
         // Root-mean-square magnitude of the gradient.
         let mut sum_sq = 0.0;
@@ -225,74 +218,6 @@ pub fn steepest_descent(ff: &mut ForceField, params: SDParams) -> rdkit_core::Re
     }
 
     Ok(energy)
-}
-
-// ---------------------------------------------------------------------------
-// Gradient helper -----------------------------------------------------------
-
-/// Central finite-difference gradient for all atoms.
-fn numerical_gradient(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<geometry::Point3D>> {
-    use geometry::Point3D;
-
-    let mut grad = Vec::with_capacity(ff.atom_count());
-
-    for idx in 0..ff.atom_count() {
-        let gx = fd_component(ff, idx, Axis::X, h)?;
-        let gy = fd_component(ff, idx, Axis::Y, h)?;
-        let gz = fd_component(ff, idx, Axis::Z, h)?;
-        grad.push(Point3D(gx, gy, gz));
-    }
-
-    Ok(grad)
-}
-
-/// Cartesian axis enumeration.
-enum Axis {
-    X,
-    Y,
-    Z,
-}
-
-/// Single coordinate finite-difference derivative.
-fn fd_component(
-    ff: &mut ForceField,
-    atom_idx: usize,
-    axis: Axis,
-    h: f64,
-) -> rdkit_core::Result<f64> {
-    // Helper closure to grab mutable reference to the chosen coordinate.
-    fn coord_mut<'a>(p: &'a mut geometry::Point3D, axis: &Axis) -> &'a mut f64 {
-        match axis {
-            Axis::X => &mut p.0,
-            Axis::Y => &mut p.1,
-            Axis::Z => &mut p.2,
-        }
-    }
-
-    // Forward displacement.
-    // Backup, forward displacement -------------------------------------------------
-    let orig;
-    {
-        let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
-        orig = *coord;
-        *coord = orig + h;
-    }
-    let e_plus = ff.total_energy()?;
-
-    // Backward displacement --------------------------------------------------------
-    {
-        let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
-        *coord = orig - h;
-    }
-    let e_minus = ff.total_energy()?;
-
-    // Restore ----------------------------------------------------------------------
-    {
-        let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
-        *coord = orig;
-    }
-
-    Ok((e_plus - e_minus) / (2.0 * h))
 }
 
 // ---------------------------------------------------------------------------
