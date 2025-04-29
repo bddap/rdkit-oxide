@@ -49,7 +49,7 @@ This is a large codebase. You’ll need to be careful not to bite off more than 
 
 Always run clippy and all tests before committing. Don’t commit with broken tests or unresolved lints. (Hint: use the -q option in tests to save on context consumption.)
 
-Every test from Stage 2.5 must be translated to Rust (with any rare exceptions going into “the list of shame,” ./rust-oxide/shame.md). Remember that Rust has slightly different idioms for test location.
+Every test from Stage 2.5 must be translated to Rust (with any rare exceptions going into “the list of shame,” ./shame.md). Remember that Rust has slightly different idioms for test location.
 
 You can always use your notes from previous steps, e.g. Stage 2 and Stage 3.
 
