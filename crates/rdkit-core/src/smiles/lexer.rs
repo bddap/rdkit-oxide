@@ -48,13 +48,32 @@ impl<'a> Iterator for Lexer<'a> {
             '(' => Tok::BranchOpen,
             ')' => Tok::BranchClose,
 
-            // Bonds -------------------------------------------------------
-            '-' | '=' | '#' | ':' | '/' | '\\' => Tok::Bond(c),
+            // Bonds (may herald a ring closure) --------------------------
+            '-' | '=' | '#' | ':' | '/' | '\\' => {
+                // If bond char is immediately followed by ring index, fold
+                // into a single Ring token capturing the bond type.
+                match self.peek() {
+                    Some(d @ '0'..='9') => {
+                        // single-digit ring number
+                        let digit = self.bump().unwrap();
+                        let idx = self.read_number(digit);
+                        Tok::Ring(idx, Some(c))
+                    }
+                    Some('%') => {
+                        // multi-digit ring index: e.g. "C-%10"
+                        self.bump(); // consume '%'
+                        let d1 = self.bump()?.to_digit(10)?;
+                        let d2 = self.bump()?.to_digit(10)?;
+                        Tok::Ring(10 * d1 + d2, Some(c))
+                    }
+                    _ => Tok::Bond(c),
+                }
+            }
 
-            // Ring closures ----------------------------------------------
+            // Ring closures without explicit bond ------------------------
             '0'..='9' => Tok::Ring(self.read_number(c), None),
             '%' => {
-                // Multi-digit ring index %10 …
+                // Multi-digit ring index %ab where a,b∈[0-9]
                 let d1 = self.bump()?.to_digit(10)?;
                 let d2 = self.bump()?.to_digit(10)?;
                 Tok::Ring(10 * d1 + d2, None)
@@ -92,6 +111,22 @@ mod tests {
     fn tokenise_simple() {
         let toks: Vec<_> = Lexer::new("CC(=O)O").collect();
         assert_eq!(toks.len(), 7); // C C ( = O ) O
+    }
+
+    #[test]
+    fn ring_with_bonds() {
+        // Simple cyclohexane ring closure
+        let toks: Vec<_> = Lexer::new("C1CCCCC1").collect();
+        assert!(matches!(toks[1], Tok::Ring(1, None)) || matches!(toks[6], Tok::Ring(1, None)));
+
+        // Ring with explicit '=' bond preceding the first index
+        let toks: Vec<_> = Lexer::new("C=1CCCCC1").collect();
+        assert!(matches!(toks[1], Tok::Ring(1, Some('='))));
+
+        // Multi-digit ring index with bond
+        let toks: Vec<_> = Lexer::new("C-%12CCCC%12").collect();
+        // Expect first Ring token carries '-' bond and idx 12
+        assert!(matches!(toks[1], Tok::Ring(12, Some('-'))));
     }
 
     #[test]
