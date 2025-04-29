@@ -50,7 +50,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] RDGeneral tests (legacy-rdkit-map/tests.md)
   - [x] DataStructs tests (legacy-rdkit-map/tests.md)
   - [x] Geometry & DistGeom tests (legacy-rdkit-map/tests.md)
-  - [ ] ForceField tests
+  - [x] ForceField tests (legacy-rdkit-map/tests.md)
   - [ ] GraphMol core + submodules tests
   - [ ] SimDivPickers tests
   - [ ] Numerics tests
@@ -72,4 +72,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – ForceField tests catalogue.”**
+Currently working on: **“Stage 2.5 – GraphMol tests catalogue.”**

@@ -39,6 +39,17 @@ Completed: RDGeneral, DataStructs
 | `DistGeom/testDistGeom.cpp` | `test1()` – triangle smoothing of bounds matrix with analytical expectations.<br>`testIssue216()` – reproduces bug #216 ensuring initial coordinate generation from symmetric matrix yields unit edge lengths.<br>Main() runs and prints via RDLog. | Core validation of distance-geometry numeric routines (`BoundsMatrix`, `computeInitialCoords`). |
 
 Pending sections: ForceField, GraphMol, SimDivPickers, Numerics, Misc.
+------------------------------------------------------------------------------
+
+## ForceField
+
+| File | Key tests | Purpose |
+|------|-----------|---------|
+| `ForceField/catch_tests.cpp` | `TEST_CASE("Test DistanceConstraintContribs")` – absolute and relative distance constraints converge to expected values.<br>`TEST_CASE("Test AngleConstraintContribs")` – verify angle constraints and RMS convergence (lines ~60–140). | Generic constraint contrib tests using mini propane molecule; exercises force‐field creation via `FFConvenience`. |
+| `ForceField/UFF/testUFFForceField.cpp` | `test1()` – low-level ForceField API distances, angle calculation.<br>`testUFFBuilder()` – build UFF force field for benzene, run minimization, check energy (lines ~200).<br>`testUFFConstraints()` – position, torsion, distance constraints (≥400). | Regression coverage for UFF energy terms and builder utilities. |
+| `ForceField/MMFF/testMMFFForceField.cpp` | `testBasics()` – parameter loading from CSV, atom type assignments.<br>`testOptimization()` – minimize chloroethane and compare final energy to expected.<br>`testMultiThread()` – ensure thread-safety by optimizing 50 molecules in parallel (guarded by `RDK_THREADSAFE_SSS`). | Mirrors UFF tests but for MMFF94; ensures variant parameter selection (94 vs 94s) yields correct energies. |
+
+Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 
 ------------------------------------------------------------------------------
