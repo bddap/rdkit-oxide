@@ -44,6 +44,20 @@ Geometry::Point3D -> defined in -> Code/Geometry/point.h
 ForceField::ForceField -> implemented in -> Code/ForceField/ForceField.cpp
 ForceField::ForceField -> calls -> Numerics::Vector
 
+# GraphMol – Core relationships
+
+GraphMol::Atom -> implemented in -> Code/GraphMol/Atom.cpp
+GraphMol::Atom -> defined in -> Code/GraphMol/Atom.h
+GraphMol::Atom::getTotalValence -> calls -> GraphMol::Bond::getValenceContrib
+
+GraphMol::Bond -> implemented in -> Code/GraphMol/Bond.cpp
+GraphMol::Bond -> defined in -> Code/GraphMol/Bond.h
+GraphMol::Bond::setStereoAtoms -> uses -> std::vector<unsigned int>
+
+GraphMol::Conformer -> implemented in -> Code/GraphMol/Conformer.cpp
+GraphMol::Conformer -> defined in -> Code/GraphMol/Conformer.h
+GraphMol::Conformer::getAtomPos -> returns -> Geometry::Point3D
+
 -------------------------------------------------------------------------------
 
 More detailed per-function edges will be appended incrementally in subsequent
