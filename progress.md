@@ -27,7 +27,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Reaction chemistry (legacy-rdkit-map/GraphMol_Reaction.md)
     - [x] Depictor (legacy-rdkit-map/GraphMol_Depictor.md)
     - [x] Stereochemistry & CIPLabeler (legacy-rdkit-map/GraphMol_Stereo.md)
-    - [ ] FilterCatalog
+    - [x] FilterCatalog (legacy-rdkit-map/GraphMol_FilterCatalog.md)
     - [ ] FMCS
     - [ ] DistGeomHelpers & ForceFieldHelpers
   - [-] JavaWrappers (skip – no Rust port)
@@ -63,4 +63,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` FilterCatalog.”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` FMCS.”**
