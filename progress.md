@@ -42,7 +42,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] RDStreams (legacy-rdkit-map/RDStreams.md)
   - [x] SimDivPickers (legacy-rdkit-map/SimDivPickers.md)
 
-- [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
+  - [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
 
 ## Stage 2.5 – Unit test catalogue (in progress)
 
@@ -82,4 +82,6 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – Final review and wrap-up.”**
+## Stage 2.5 status: complete ✅
+
+Currently working on: **“Stage 3 – Relationship graph.”**
