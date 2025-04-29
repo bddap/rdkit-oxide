@@ -383,7 +383,7 @@ impl ForceField {
             }
 
             // ∂E/∂r (scalar)
-            let dEdr = crate::bond_stretch_energy_derivative(
+            let d_edr = crate::bond_stretch_energy_derivative(
                 &self.atoms[a_idx].label,
                 &self.atoms[b_idx].label,
                 bond.order,
@@ -394,7 +394,7 @@ impl ForceField {
             let u = r_vec / r;
 
             // Contribution vector.
-            let g = u * dEdr; // Vector3D
+            let g = u * d_edr; // Vector3D
 
             // Accumulate (note the sign difference for the two atoms).
             grad[a_idx].0 += g.x();
@@ -443,7 +443,7 @@ impl ForceField {
             let sin_theta = theta.sin().abs().max(1e-8); // avoid div by 0
 
             // dE/dθ (scalar)
-            let dEdTheta = crate::angle_bend_energy_derivative(
+            let d_ed_theta = crate::angle_bend_energy_derivative(
                 &self.atoms[i_idx].label,
                 &self.atoms[j_idx].label,
                 &self.atoms[k_idx].label,
@@ -462,7 +462,7 @@ impl ForceField {
             let term_c = (r1 * (inv_r1 * inv_r2)) - (r2 * (cos_theta * inv_r2 * inv_r2));
 
             // Scalar factor
-            let coef = -dEdTheta / sin_theta; // negative due to dcos/dx vs dθ/dcos
+            let coef = -d_ed_theta / sin_theta; // negative due to dcos/dx vs dθ/dcos
 
             let g_i = term_a * coef;
             let g_k = term_c * coef;
