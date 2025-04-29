@@ -22,7 +22,7 @@ mirroring the existing C++ module boundaries while observing Rust idioms:
     forcefield-uff/   # UFF parameterisation
     forcefield-mmff/  # MMFF94 parameterisation
     distgeom/         # bounds matrix, triangle smoothing, embedding support
-    graphmol/         # Atom, Bond, ROMol, conformers, descriptors, etc.
+    graphmol/         # Atom, Bond, Mol (single struct), conformers, descriptors, etc.
     simdivpickers/    # pickers and clustering utils
     catalog/          # hierarchical catalog infrastructure
     features/         # explicit/implicit chemical features
@@ -86,8 +86,16 @@ larger black-box tests in the workspace’s `tests/` directory.
    Bounds matrix, triangle smoothing, random distance mat sampling, embedding.
 
 5. **GraphMol core**  
-   Atoms / bonds / ROMol with petgraph; conformers store vectors of Point3D.  
-   Descriptors & fingerprints gradually ported.
+   • `Mol` is the *only* molecule struct.  Read-only access uses `&Mol`,
+     editing uses `&mut Mol` – Rust’s borrow checker provides the safety that
+     C++ achieved via the `ROMol`/`RWMol` class split.  
+   • Internally, the molecular graph is stored in a `petgraph::Graph` with
+     atom/node indices kept stable.  
+   • Convenience *editing session* wrapper `MolEditor<'_>` will be introduced
+     (new-type holding `&mut Mol`) to replicate C++’s batch-edit pattern and
+     handle automatic sanitisation on drop.  
+   • Conformers keep `Vec<Point3D>` coordinate arrays.  
+   • Descriptors & fingerprints gradually ported.
 
 6. **Remaining subsystems**  
    SimDivPickers, Catalogs, Features, etc.  Many of these depend mostly on
@@ -102,7 +110,9 @@ larger black-box tests in the workspace’s `tests/` directory.
 * Use Rust enums for atom types, bond stereochemistry, etc.  C++ integer flags
   replaced with strongly-typed bitflags (`bitflags` crate).
 * Trait-based polymorphism replaces class inheritance (e.g. `Contrib`
-  hierarchy, picker strategies).
+  hierarchy, picker strategies).  The former `ROMol`/`RWMol` distinction is
+  collapsed into a *single* `Mol`; Rust references (`&Mol` vs `&mut Mol`)
+  express mutability.
 * Parameter tables generated at build time (`build.rs`) into `phf` static maps
   for O(1) lookup.
 * Thread safety by default (`Send`/`Sync` derived) – lock-free where possible,
@@ -141,13 +151,15 @@ Timeline is flexible; adjust upon discoveries.
 
 ## 7. Open questions / research spikes
 
-* Should we wrap nalgebra types directly or introduce lightweight newtypes to
-  keep API independent from backend?  Start with newtypes for flexibility.
-* Decide whether to keep per-atom `usize` index stable or use petgraph’s NodeId.
-* Investigate compile-time generation of UFF/MMFF parameter tables (build
-  script vs. `include_bytes!`).
+* Wrap nalgebra types directly or introduce lightweight newtypes to keep API
+  independent from backend?  (Lean towards *newtypes* for forward-compat.)
+* Keep per-atom `usize` index stable (mirrors RDKit int ids) or rely on
+  `petgraph::NodeIndex` everywhere?  (Plan: store NodeIndex internally but
+  expose stable `AtomIdx(u32)` newtype.)
+* Investigate compile-time generation of UFF/MMFF parameter tables (done –
+  solved via build.rs → `phf` map).  Extend same pattern to MMFF.
 * Evaluate `ndarray` vs. `nalgebra` for certain numeric needs.
 
 -------------------------------------------------------------------------------
 
-_Last updated: Stage 4 kick-off._
+_Last updated: Stage 5 – unified `Mol` design adopted._
