@@ -11,6 +11,8 @@
 use forcefield_uff as uff;
 use rdkit_core::{invariant, RdError, Result};
 
+pub mod field;
+
 
 // ---------------------------------------------------------------------------
 // Constants identical to those in rdkit C++ `Params.h`

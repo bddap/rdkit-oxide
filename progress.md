@@ -132,7 +132,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Inversion term energy + gradient (crates/forcefield-core).
   - [x] van-der-Waals / Lennard-Jones term (generic LJ 12-6) + derivative (crates/forcefield-core).
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
-  - [ ] Aggregate ForceField struct storing particles & computing total energy.
+  - [x] Aggregate ForceField struct storing particles & computing total energy (crates/forcefield-core/field.rs).
 
 - [ ] Minimisation / optimisation engine
   - [ ] Implement steepest-descent and conjugate-gradient algorithms (or integrate `argmin` crate).
@@ -153,4 +153,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Evaluate `petgraph` or custom graph for molecule.
 
 
-Currently working on: **Stage 5 – forcefield-core: implement aggregate ForceField struct**
+Currently working on: **Stage 5 – Minimisation engine – steepest descent**
