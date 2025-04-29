@@ -7,9 +7,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
 - [x] Create `legacy-rdkit-map/overall.md` containing a high-level map of RDKit’s root modules.
   - Path: `legacy-rdkit-map/overall.md`
 
-## Stage 2 – In-depth maps (pending)
+## Stage 2 – In-depth maps (complete)
 
-- [ ] Produce detailed symbol maps for every first-level module in `rdkit/Code/`:
+- [x] Produce detailed symbol maps for every first-level module in `rdkit/Code/`:
   - [x] Catalogs (legacy-rdkit-map/Catalogs.md)
   - [x] ChemicalFeatures (legacy-rdkit-map/ChemicalFeatures.md)
   - [x] DataManip (legacy-rdkit-map/DataManip.md)
@@ -42,7 +42,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] RDStreams (legacy-rdkit-map/RDStreams.md)
   - [x] SimDivPickers (legacy-rdkit-map/SimDivPickers.md)
 
-- [ ] Recursively expand the checklist for each sub-module once its parent summary is done.
+- [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
 
 ## Stage 2.5 – Unit test catalogue (pending)
 
