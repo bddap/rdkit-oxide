@@ -25,6 +25,8 @@ impl<'a> Lexer<'a> {
         } else { None }
     }
 
+
+
     fn read_number(&mut self, first: char) -> u32 {
         let mut val = first.to_digit(10).unwrap();
         while let Some(c) = self.peek() {
@@ -90,5 +92,25 @@ mod tests {
     fn tokenise_simple() {
         let toks: Vec<_> = Lexer::new("CC(=O)O").collect();
         assert_eq!(toks.len(), 7); // C C ( = O ) O
+    }
+
+    #[test]
+    fn tokenise_realistic_cases_small_set() {
+        let cases = [
+            "c1ccc(CCCN2CCC(c3ccccc3)CC2)cc1",
+            "F[C@H]1CN(CCCc2c[nH]c3ccc(-n4cnnc4)cc23)CC[C@@H]1NCc1ccccc1C(F)(F)F",
+            "N=C(c1cc2ccc(O)cc2[nH]1)N1CCC(Cc2ccccc2)CC1",
+            "C[C@@H](C(=O)N1CCC[C@H]1C(=O)N[C@H](C=O)CCCN=C(N)N)c1ccccc1",
+            "O=C(Cc1ccc(OCc2ccccc2)cc1)N(O)Cc1ccccc1",
+            "O=C(Nc1cccc(Oc2cccc3[nH]c(=O)[nH]c23)c1)c1ccc(Cl)c(C(F)(F)F)c1",
+            "Cn1cc(C(=O)c2ccccc2)cc1/C=C/C=C/C(=O)NO",
+            "c1ccc2c(NCCCCCCNc3c4c(nc5ccccc35)CCCCC4)c3c(nc2c1)CCCCC3",
+            "Nc1ccccc1NC(=O)c1ccc(C(=O)Nc2cccc(Nc3ncc(-c4cccnc4)s3)c2)s1",
+            "O=C(O)Cc1ccc(-c2ccccc2NC(=O)c2ccccc2-c2cc(O)c(O)c(O)c2)s1",
+        ];
+        for s in &cases {
+            let toks: Vec<_> = Lexer::new(s).collect();
+            assert!(!toks.is_empty(), "{}", s);
+        }
     }
 }

@@ -197,4 +197,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – SMILES lexer/tokeniser implementation**
+Update 2025-04-29 – Fixed duplicate inline tests inside `smiles/lexer.rs` that broke
+`cargo test`; moved realistic test-set into separate `tests` module and added the
+10 sample SMILES provided by the user. Workspace now builds cleanly with
+`cargo test` and `cargo clippy -D warnings`.
+
+Currently working on: **Stage 5 – SMILES lexer/tokeniser implementation (next up: ring-bond precedence + error handling)**
