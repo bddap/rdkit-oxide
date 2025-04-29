@@ -44,9 +44,17 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
 
-## Stage 2.5 – Unit test catalogue (pending)
+## Stage 2.5 – Unit test catalogue (in progress)
 
 - [ ] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
+  - [ ] RDGeneral tests
+  - [ ] DataStructs tests
+  - [ ] Geometry & DistGeom tests
+  - [ ] ForceField tests
+  - [ ] GraphMol core + submodules tests
+  - [ ] SimDivPickers tests
+  - [ ] Numerics tests
+  - [ ] Misc/other modules tests
 
 ## Stage 3 – Relationship graph (pending)
 
@@ -64,4 +72,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – Producing unit test catalogue.”**
+Currently working on: **“Stage 2.5 – RDGeneral tests catalogue.”**
