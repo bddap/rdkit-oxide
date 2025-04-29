@@ -61,6 +61,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9134a6ef01ce4b366b50689c94f82c14bc72bc5d0386829828a2e2752ef7958c"
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
 name = "datastructs"
 version = "0.1.0"
 dependencies = [
@@ -68,8 +74,10 @@ dependencies = [
  "base64",
  "bincode",
  "bitvec",
+ "byteorder",
  "rdkit-core",
  "serde",
+ "thiserror",
 ]
 
 [[package]]

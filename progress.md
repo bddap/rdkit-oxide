@@ -121,7 +121,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
 - [ ] Datastructs crate – feature parity with C++
   - [x] Complete SparseBitVect API and translate associated tests (commit <pending>).
   - [x] Port RealValueVect and DiscreteValueVect, incl. serialisation (commit <pending>).
-  - [ ] Implement FPB fingerprint binary reader (streaming, memory-mapped).
+  - [x] Implement FPB fingerprint binary reader (streaming, memory-mapped).
+    - Path: `crates/datastructs/src/fpb.rs`, tests in same module.
 
 - [ ] Geometry crate (to create)
   - [ ] Point3D and Vector3D types + basic linear algebra traits.
@@ -154,4 +155,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Implement FPB fingerprint binary reader**
+Currently working on: **Stage 5 – Geometry crate – transformation matrices & quaternion helpers**

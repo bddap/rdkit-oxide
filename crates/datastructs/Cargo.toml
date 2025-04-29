@@ -9,6 +9,8 @@ bitvec = { version = "1", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
 base64 = "0.21"
+byteorder = "1.4"
+thiserror = "1.0"
 
 [dev-dependencies]
 approx = "0.5"

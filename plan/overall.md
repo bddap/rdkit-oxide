@@ -16,7 +16,7 @@ mirroring the existing C++ module boundaries while observing Rust idioms:
   crates/
     rdkit-core/       # common types, error enums, logging, utilities
     datastructs/      # bit vectors, FPB, sparse vectors
-    geometry/         # Point3D, transforms, uniform grids
+    geometry/         # Point3D, Vector3D, transforms (matrices, quaternions), uniform grids
     numerics/         # thin wrappers around nalgebra + optimizers
     forcefield-core/  # generic FF engine + contrib traits (current crate)
     forcefield-uff/   # UFF parameterisation (build-generated tables)
@@ -56,7 +56,7 @@ larger black-box tests in the workspace’s `tests/` directory.
 
 ## 2. External dependencies
 
-* `nalgebra` (+ `nalgebra-sparse`) for vectors, matrices, transforms.
+* `nalgebra` (+ `nalgebra-sparse`) for low-level linear-algebra primitives: `Vector3`, `Matrix3/4`, `Quaternion` and associated transforms.  `geometry` crate will provide thin newtypes (`Point3D`, `Vector3D`, `Quaternion`) wrapping the nalgebra types but re-export `nalgebra`’s math where appropriate.
 * `bitvec` for low-level bit manipulations (though custom bit-packing may still
   be required for fingerprint parity).
 * `petgraph` for graph algorithms (molecule graph, catalogs).
