@@ -1,38 +1,41 @@
-//! Minimal molecular graph datastructures (Atom, Bond, Mol).
+//! Minimal molecule graph primitives in an idiomatic‐Rust style.
 
 use std::collections::HashMap;
 
-/// Chemical element symbol (atomic number encoded as u8 for space efficiency).
+/// Chemical element.  Tagged with the IUPAC atomic number via `repr(u8)` so
+/// that `as u8` yields `Z` cheaply.
+#[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Element(pub u8);
+pub enum Element {
+    H = 1,
+    C = 6,
+    N = 7,
+    O = 8,
+    F = 9,
+    P = 15,
+    S = 16,
+    Cl = 17,
+    Br = 35,
+    I = 53,
+    // Extend as needed…
+}
 
 impl Element {
-    pub const H: Self = Element(1);
-    pub const C: Self = Element(6);
-    pub const N: Self = Element(7);
-    pub const O: Self = Element(8);
-    pub const F: Self = Element(9);
-    pub const P: Self = Element(15);
-    pub const S: Self = Element(16);
-    #[allow(non_upper_case_globals)]
-    pub const Cl: Self = Element(17);
+    /// Return the atomic number (`Z`).
+    pub fn atomic_number(self) -> u8 { self as u8 }
 }
 
-/// Bond order enumeration.
+/// Covalent bond order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum BondOrder {
-    Single,
-    Double,
-    Triple,
-    Aromatic,
-}
+pub enum BondOrder { Single, Double, Triple, Aromatic }
 
-/// Atom representation with minimal properties.
+/// Single atom record – intentionally sparse for now.
 #[derive(Debug, Clone)]
 pub struct Atom {
     pub element: Element,
     pub formal_charge: i8,
     pub explicit_h_count: u8,
+
     #[allow(dead_code)]
     props: HashMap<String, String>,
 }
@@ -43,28 +46,15 @@ impl Atom {
     }
 }
 
-/// Bond connecting two atoms (undirected).
+/// Undirected bond edge.
 #[derive(Debug, Clone)]
-pub struct Bond {
-    pub a: usize,
-    pub b: usize,
-    pub order: BondOrder,
-}
+pub struct Bond { pub a: usize, pub b: usize, pub order: BondOrder }
 
-/// Molecule as adjacency list.
-#[derive(Debug, Clone)]
-pub struct Mol {
-    pub atoms: Vec<Atom>,
-    pub bonds: Vec<Bond>,
-}
-
-impl Default for Mol {
-    fn default() -> Self { Self::new() }
-}
+/// Molecule as adjacency lists.
+#[derive(Debug, Clone, Default)]
+pub struct Mol { pub atoms: Vec<Atom>, pub bonds: Vec<Bond> }
 
 impl Mol {
-    pub fn new() -> Self { Self { atoms: Vec::new(), bonds: Vec::new() } }
-
     pub fn add_atom(&mut self, atom: Atom) -> usize {
         let idx = self.atoms.len();
         self.atoms.push(atom);
@@ -81,13 +71,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn element_atomic_number() {
+        assert_eq!(Element::O.atomic_number(), 8);
+        assert_eq!(Element::Cl.atomic_number(), 17);
+    }
+
+    #[test]
     fn build_water() {
-        let mut m = Mol::new();
+        let mut m = Mol::default();
         let o = m.add_atom(Atom::new(Element::O));
         let h1 = m.add_atom(Atom::new(Element::H));
         let h2 = m.add_atom(Atom::new(Element::H));
         m.add_bond(o, h1, BondOrder::Single);
         m.add_bond(o, h2, BondOrder::Single);
+
         assert_eq!(m.atoms.len(), 3);
         assert_eq!(m.bonds.len(), 2);
     }
