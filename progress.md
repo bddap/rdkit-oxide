@@ -2,12 +2,12 @@
 
 This file is updated incrementally to survive context compression.  Each top-level TODO corresponds to one deliverable in `job.md`.  Nested lists can be arbitrarily deep.
 
-## Stage 1 – Root summary (this commit)
+## Stage 1 – Root summary (complete ✅)
 
 - [x] Create `legacy-rdkit-map/overall.md` containing a high-level map of RDKit’s root modules.
   - Path: `legacy-rdkit-map/overall.md`
 
-## Stage 2 – In-depth maps (complete)
+## Stage 2 – In-depth maps (complete ✅)
 
 - [x] Produce detailed symbol maps for every first-level module in `rdkit/Code/`:
   - [x] Catalogs (legacy-rdkit-map/Catalogs.md)
@@ -44,7 +44,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
   - [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
 
-## Stage 2.5 – Unit test catalogue (in progress)
+## Stage 2.5 – Unit-test catalogue (in progress 🛠️)
 
 - [ ] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
   - [x] RDGeneral tests (legacy-rdkit-map/tests.md)
@@ -83,11 +83,11 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Expand Geometry & DistGeom core relationships (map.md)
   - [x] Expand RDGeneral, RDStreams relationships (map.md)
 
-## Stage 4 – Rust rewrite plan (pending)
+## Stage 4 – Rust rewrite plan (in progress 🛠️)
 
  - [x] Draft high-level module plan in `plan/overall.md`.
 
-## Stage 5 – Implementation (pending)
+## Stage 5 – Implementation (in progress 🛠️)
 
  - [ ] Bootstrap Cargo workspace `./`
    - [x] root `Cargo.toml` with workspace members (commit <pending>)
@@ -102,8 +102,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-## Stage 2.5 status: complete ✅
-
-## Stage 4 status: in progress 🛠️
-
-Currently working on: **“Stage 5 – Flesh out ExplicitBitVect full API & translate more tests.”**
+Currently working on: **Stage 5 – Flesh out `ExplicitBitVect` full API & translate additional tests.**
