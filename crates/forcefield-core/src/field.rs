@@ -336,6 +336,41 @@ impl ForceField {
     }
 
     // -------------------------------------------------------------------
+    // Gradient aggregation ------------------------------------------------
+
+    /// Return the current analytic Cartesian gradient for all energy terms
+    /// that have dedicated derivative implementations.
+    ///
+    /// The present version aggregates the contributions from *bond-stretch*
+    /// and *angle-bend* terms.  The other components (torsion, inversion,
+    /// van-der-Waals, electrostatics, …) still fall back to numerical
+    /// derivatives in the optimisation stage until their analytic forms are
+    /// added.
+    pub fn analytic_gradient(&self) -> rdkit_core::Result<Vec<geometry::Point3D>> {
+        use geometry::Point3D;
+
+        let mut grad = vec![Point3D(0.0, 0.0, 0.0); self.atom_count()];
+
+        // Bond term ------------------------------------------------------
+        let bond_grad = self.bond_gradients()?;
+        for (total, g) in grad.iter_mut().zip(bond_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
+        // Angle term -----------------------------------------------------
+        let angle_grad = self.angle_gradients()?;
+        for (total, g) in grad.iter_mut().zip(angle_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
+        Ok(grad)
+    }
+
+    // -------------------------------------------------------------------
     // Gradient helpers ---------------------------------------------------
 
     /// Compute analytic **per-atom** Cartesian gradients (∂E/∂x, ∂E/∂y, ∂E/∂z)

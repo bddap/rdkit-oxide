@@ -60,7 +60,9 @@ pub fn conjugate_gradient(ff: &mut ForceField, params: CGParams) -> rdkit_core::
 
     // Initial energy and gradient.
     let mut energy = ff.total_energy()?;
-    let mut g_prev = numerical_gradient(ff, FD_EPS)?;
+    let mut g_prev = ff
+        .analytic_gradient()
+        .unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
 
     // Initial search direction is the negative gradient.
     let mut dir: Vec<Point3D> = g_prev.iter().map(|p| Point3D(-p.0, -p.1, -p.2)).collect();
@@ -106,7 +108,9 @@ pub fn conjugate_gradient(ff: &mut ForceField, params: CGParams) -> rdkit_core::
         energy = new_energy;
 
         // Compute new gradient.
-        let g_curr = numerical_gradient(ff, FD_EPS)?;
+        let g_curr = ff
+            .analytic_gradient()
+            .unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
 
         // Polak–Ribiere β = g_k · (g_k − g_{k-1}) / (g_{k-1} · g_{k-1})
         let gg = grad_dot(&g_prev, &g_prev);
@@ -172,8 +176,8 @@ pub fn steepest_descent(ff: &mut ForceField, params: SDParams) -> rdkit_core::Re
     let mut energy = ff.total_energy()?;
 
     for _iter in 0..params.max_iters {
-        // ∇E by finite differences.
-        let grad = numerical_gradient(ff, FD_EPS)?;
+        // Prefer analytic gradient when available.
+        let grad = ff.analytic_gradient().unwrap_or_else(|_| numerical_gradient(ff, FD_EPS).unwrap());
 
         // Root-mean-square magnitude of the gradient.
         let mut sum_sq = 0.0;

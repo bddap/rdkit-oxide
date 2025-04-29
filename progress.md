@@ -178,4 +178,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 Currently working on: **Stage 5 – Implement analytic per-atom gradient for angle-bend terms**
 
-Currently working on: **Stage 5 – Integrate analytic bond & angle gradients into optimisation (replace numerical gradient)**
+Currently working on: **Stage 5 – Implement torsion analytic gradients**
