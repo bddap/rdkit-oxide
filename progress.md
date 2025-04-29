@@ -120,7 +120,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] Datastructs crate – feature parity with C++
   - [x] Complete SparseBitVect API and translate associated tests (commit <pending>).
-  - [ ] Port RealValueVect and DiscreteValueVect, incl. serialisation.
+  - [x] Port RealValueVect and DiscreteValueVect, incl. serialisation (commit <pending>).
   - [ ] Implement FPB fingerprint binary reader (streaming, memory-mapped).
 
 - [ ] Geometry crate (to create)
@@ -154,4 +154,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Port RealValueVect and DiscreteValueVect**
+Currently working on: **Stage 5 – Implement FPB fingerprint binary reader**
