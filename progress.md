@@ -128,6 +128,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 - [ ] forcefield-core expansion
   - [ ] Torsion (dihedral) term energy + gradient.
+  - [x] Torsion (dihedral) term energy + gradient (crates/forcefield-core).
   - [ ] Inversion term energy + gradient.
   - [ ] van-der-Waals / Lennard-Jones term (UFF parameters) + switch distance.
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
@@ -152,4 +153,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Evaluate `petgraph` or custom graph for molecule.
 
 
-Currently working on: **Stage 5 – forcefield-core: implement torsion (dihedral) term energy + gradient**
+Currently working on: **Stage 5 – forcefield-core: implement inversion term energy + gradient**

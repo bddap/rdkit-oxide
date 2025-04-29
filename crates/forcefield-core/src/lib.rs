@@ -178,6 +178,30 @@ pub fn angle_bend_energy(
 }
 
 // ---------------------------------------------------------------------------
+// Public API – torsion / dihedral term
+// ---------------------------------------------------------------------------
+
+/// UFF torsional potential uses the OPLS/CHARMM style cosine series:
+///
+///    E(φ) = ½ * V * (1 + cos(nφ − φ₀))
+///
+/// For most elements `φ₀` is either 0° or 180°; the literature barrier
+/// heights `V` for common combinations (sp³, sp², etc.) will be hooked in
+/// later.  For now callers provide `v_barrier`, `periodicity` (*n*) and the
+/// equilibrium phase `phi0` in *radians*.
+pub fn torsion_energy(v_barrier: f64, periodicity: u32, phi: f64, phi0: f64) -> f64 {
+    0.5 * v_barrier * (1.0 - ((periodicity as f64) * phi - phi0).cos())
+}
+
+/// Derivative of the torsion energy with respect to the dihedral angle *φ*
+/// (∂E/∂φ) – useful for gradient computation.
+#[allow(clippy::needless_pass_by_value)]
+pub fn torsion_energy_derivative(v_barrier: f64, periodicity: u32, phi: f64, phi0: f64) -> f64 {
+    // d/dφ [½ V (1 + cos(nφ − φ₀))] = -½ V n sin(nφ − φ₀)
+    0.5 * v_barrier * (periodicity as f64) * ((periodicity as f64) * phi - phi0).sin()
+}
+
+// ---------------------------------------------------------------------------
 // Unit tests – basic sanity checks versus reference C++ values
 // ---------------------------------------------------------------------------
 
@@ -209,5 +233,29 @@ mod tests {
         // Distort to 120°, energy must increase
         let e_distort = angle_bend_energy("H_", "O_3", "H_", 120.0_f64.to_radians(), 1.0, 1.0).unwrap();
         assert!(e_distort > 0.1);
+    }
+
+    #[test]
+    fn torsion_energy_periodicity() {
+        use std::f64::consts::PI;
+
+        let v = 3.0; // kcal/mol
+        let n = 3u32;
+        let phi0 = 0.0;
+
+        // Energy minima every 120° (2π/3)
+        for k in 0..n {
+            let angle = (k as f64) * (2.0 * PI / n as f64);
+            let e = torsion_energy(v, n, angle, phi0);
+            assert_relative_eq!(e, 0.0, epsilon = 1e-12);
+            // derivative ~ 0 as well
+            let d = torsion_energy_derivative(v, n, angle, phi0);
+            assert_relative_eq!(d, 0.0, epsilon = 1e-12);
+        }
+
+        // Maximum at halfway between minima (60°)
+        let phi_max = PI / 3.0; // 60°
+        let e_max = torsion_energy(v, n, phi_max, phi0);
+        assert_relative_eq!(e_max, v, epsilon = 1e-12);
     }
 }
