@@ -15,6 +15,12 @@ pub enum RdError {
 /// Helper type alias.
 pub type Result<T, E = RdError> = std::result::Result<T, E>;
 
+// ---------------------------------------------------------------------------
+// Sub-modules
+// ---------------------------------------------------------------------------
+
+pub mod mol;
+
 /// Runtime invariant check (similar to RDKit's `PRECONDITION`).
 #[macro_export]
 macro_rules! invariant {
