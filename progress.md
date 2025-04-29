@@ -66,9 +66,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Numerics tests (tests.md)
     - [x] Misc/other modules tests (tests.md)
 
-## Stage 3 – Relationship graph (pending)
+## Stage 3 – Relationship graph (complete ✅)
 
-- [ ] Create `legacy-rdkit-map/map.md` with text graph of symbol relationships.
+- [x] Create `legacy-rdkit-map/map.md` with text graph of symbol relationships.
   - [x] Skeleton graph with root module examples (commit b02e15a^..)
   - [x] Expand DataStructs relationships (map.md)
     - [x] Expand GraphMol core relationships (map.md)
@@ -85,7 +85,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 4 – Rust rewrite plan (pending)
 
-- [ ] Draft high-level module plan in `plan/overall.md`.
+ - [x] Draft high-level module plan in `plan/overall.md`.
 
 ## Stage 5 – Implementation (pending)
 
@@ -97,4 +97,6 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 2.5 status: complete ✅
 
-Currently working on: **“Stage 3 – Relationship graph completeness sweep (minor pending subsystems).”**
+## Stage 4 status: in progress 🛠️
+
+Currently working on: **“Stage 5 – Bootstrap Rust workspace and port datastructs core.”**
