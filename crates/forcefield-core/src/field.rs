@@ -123,6 +123,87 @@ mod tests {
             assert_relative_eq!(ga.2, gf.2, epsilon = 1e-5);
         }
     }
+
+    #[test]
+    fn angle_gradients_match_fd() {
+        // Water molecule – focus on angle contribution only.
+        let mut ff = ForceField::default();
+
+        let o = ff.add_atom("O_3", Point3D(0.0, 0.0, 0.0));
+        let h1 = ff.add_atom("H_", Point3D(0.96, 0.0, 0.0));
+        let h2 = ff.add_atom("H_", Point3D(-0.24, 0.93, 0.0));
+
+        ff.add_angle(h1, o, h2, 1.0, 1.0);
+
+        // Analytic gradients for angle term.
+        let g_ana = ff.angle_gradients().unwrap();
+
+        // Finite-difference gradients (full energy, but only angle term present).
+        fn numerical_grad(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<Point3D>> {
+            use geometry::Point3D;
+
+            enum Axis {
+                X,
+                Y,
+                Z,
+            }
+
+            fn coord_mut<'a>(p: &'a mut Point3D, axis: &Axis) -> &'a mut f64 {
+                match axis {
+                    Axis::X => &mut p.0,
+                    Axis::Y => &mut p.1,
+                    Axis::Z => &mut p.2,
+                }
+            }
+
+            fn fd_comp(
+                ff: &mut ForceField,
+                atom_idx: usize,
+                axis: Axis,
+                h: f64,
+            ) -> rdkit_core::Result<f64> {
+                let orig;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    orig = *coord;
+                    *coord = orig + h;
+                }
+                let e_plus = ff.total_energy()?;
+
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig - h;
+                }
+                let e_minus = ff.total_energy()?;
+
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig;
+                }
+
+                Ok((e_plus - e_minus) / (2.0 * h))
+            }
+
+            let natoms = ff.atom_count();
+            let mut grad = Vec::with_capacity(natoms);
+            for idx in 0..natoms {
+                let gx = fd_comp(ff, idx, Axis::X, h)?;
+                let gy = fd_comp(ff, idx, Axis::Y, h)?;
+                let gz = fd_comp(ff, idx, Axis::Z, h)?;
+                grad.push(Point3D(gx, gy, gz));
+            }
+
+            Ok(grad)
+        }
+
+        let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
+
+        for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
+            assert_relative_eq!(ga.0, gf.0, epsilon = 1e-4);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 1e-4);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 1e-4);
+        }
+    }
 }
 
 
@@ -323,6 +404,82 @@ impl ForceField {
             grad[b_idx].0 -= g.x();
             grad[b_idx].1 -= g.y();
             grad[b_idx].2 -= g.z();
+        }
+
+        Ok(grad)
+    }
+
+    /// Compute analytic per-atom gradients coming from **angle-bend** terms
+    /// (kcal mol⁻¹ Å⁻¹).  See [`bond_gradients`] for the return format.
+    pub fn angle_gradients(&self) -> rdkit_core::Result<Vec<geometry::Point3D>> {
+        use geometry::{Point3D, Vector3D};
+
+        let mut grad = vec![Point3D(0.0, 0.0, 0.0); self.atom_count()];
+
+        for angle in &self.angles {
+            let i_idx = angle.i.0;
+            let j_idx = angle.j.0; // central
+            let k_idx = angle.k.0;
+
+            let r_i = self.atoms[i_idx].coord;
+            let r_j = self.atoms[j_idx].coord;
+            let r_k = self.atoms[k_idx].coord;
+
+            // Vectors: r1 = r_i - r_j, r2 = r_k - r_j
+            let r1: Vector3D = r_i - r_j;
+            let r2: Vector3D = r_k - r_j;
+
+            let r1_len = r1.norm();
+            let r2_len = r2.norm();
+
+            if r1_len < 1e-12 || r2_len < 1e-12 {
+                // Degenerate; skip contribution
+                continue;
+            }
+
+            // cos(theta) and theta
+            let cos_theta = clip_to_one(r1.dot(r2) / (r1_len * r2_len));
+            let theta = cos_theta.acos();
+            let sin_theta = theta.sin().abs().max(1e-8); // avoid div by 0
+
+            // dE/dθ (scalar)
+            let dEdTheta = crate::angle_bend_energy_derivative(
+                &self.atoms[i_idx].label,
+                &self.atoms[j_idx].label,
+                &self.atoms[k_idx].label,
+                theta,
+                angle.order_ij,
+                angle.order_jk,
+            )?;
+
+            // Precompute factors
+            let inv_r1 = 1.0 / r1_len;
+            let inv_r2 = 1.0 / r2_len;
+
+            // Term A = (r2 / (|r1||r2|)) - cosθ * r1 / |r1|^2
+            let term_a = (r2 * (inv_r1 * inv_r2)) - (r1 * (cos_theta * inv_r1 * inv_r1));
+            // Term C analogously with r1/r2 swapped
+            let term_c = (r1 * (inv_r1 * inv_r2)) - (r2 * (cos_theta * inv_r2 * inv_r2));
+
+            // Scalar factor
+            let coef = -dEdTheta / sin_theta; // negative due to dcos/dx vs dθ/dcos
+
+            let g_i = term_a * coef;
+            let g_k = term_c * coef;
+            let g_j = -(g_i + g_k); // momentum conservation
+
+            // accumulate
+            grad[i_idx].0 += g_i.x();
+            grad[i_idx].1 += g_i.y();
+            grad[i_idx].2 += g_i.z();
+
+            grad[k_idx].0 += g_k.x();
+            grad[k_idx].1 += g_k.y();
+            grad[k_idx].2 += g_k.z();
+
+            grad[j_idx].0 += g_j.x();
+            grad[j_idx].1 += g_j.y();
+            grad[j_idx].2 += g_j.z();
         }
 
         Ok(grad)

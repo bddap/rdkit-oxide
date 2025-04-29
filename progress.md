@@ -132,7 +132,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Inversion term energy + gradient (crates/forcefield-core).
   - [x] van-der-Waals / Lennard-Jones term (generic LJ 12-6) + derivative (crates/forcefield-core).
   - [x] Analytic per-atom gradient for bond-stretch terms (crates/forcefield-core/field.rs).
-  - [ ] Analytic per-atom gradient for angle-bend terms.
+  - [x] Analytic per-atom gradient for angle-bend terms (crates/forcefield-core/field.rs).
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
   - [x] Aggregate ForceField struct storing particles & computing total energy (crates/forcefield-core/field.rs).
 
@@ -177,3 +177,5 @@ This file is updated incrementally to survive context compression.  Each top-lev
 ---
 
 Currently working on: **Stage 5 – Implement analytic per-atom gradient for angle-bend terms**
+
+Currently working on: **Stage 5 – Integrate analytic bond & angle gradients into optimisation (replace numerical gradient)**
