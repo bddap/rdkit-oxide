@@ -116,8 +116,6 @@ This file is updated incrementally to survive context compression.  Each top-lev
  - [x] Scaffold geometry crate with Point3D
    - [x] geometry crate created with Point3D, vector ops, unit tests (commit <pending>).
 
-# New implementation milestones ------------------------------------------------
-
 - [ ] Datastructs crate – feature parity with C++
   - [x] Complete SparseBitVect API and translate associated tests (commit <pending>).
   - [x] Port RealValueVect and DiscreteValueVect, incl. serialisation (commit <pending>).
@@ -153,6 +151,5 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Decide whether to depend on `nalgebra` vs home-brew algebra.
   - [ ] Evaluate `petgraph` or custom graph for molecule.
 
----
 
 Currently working on: **Stage 5 – forcefield-core: implement torsion (dihedral) term energy + gradient**
