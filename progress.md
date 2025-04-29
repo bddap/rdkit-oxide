@@ -12,7 +12,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 - [ ] Produce detailed symbol maps for every first-level module in `rdkit/Code/`:
   - [ ] Catalogs
   - [x] Catalogs (legacy-rdkit-map/Catalogs.md)
-  - [ ] ChemicalFeatures
+  - [x] ChemicalFeatures (legacy-rdkit-map/ChemicalFeatures.md)
   - [ ] DataManip
   - [ ] DataStructs
   - [ ] DistGeom
@@ -53,4 +53,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `ChemicalFeatures` module.”**
+Currently working on: **“Stage 2 – Detailed map for `DataManip` module.”**
