@@ -138,7 +138,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Scaffold SDParams and steepest_descent placeholder (crates/forcefield-core/optim.rs).
     - [x] Flesh out gradient calculation and update coordinates (steepest descent implemented).
     - [x] Add simple Polak–Ribiere conjugate-gradient implementation (crates/forcefield-core/optim.rs).
-    - [ ] Provide `optimize_geometry()` helper.
+    - [x] Provide `optimize_geometry()` helper wrapping algorithms (crates/forcefield-core/optim.rs).
 
 - [ ] Unit-test translation – ForceField/UFF
   - [ ] Port `testUFFForceField.cpp` (bond, angle, torsion, vdW) to Rust.
@@ -159,4 +159,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] Added central finite-difference gradient, simple backtracking line search, RMS-gradient convergence.
    - [x] Unit test on distorted water molecule.
 
-Currently working on: **Stage 5 – Minimisation engine – expose optimize_geometry() helper & integrate into forcefield-core**
+Currently working on: **Stage 5 – Preparation for analytic gradients – design gradient expressions for bond, angle**

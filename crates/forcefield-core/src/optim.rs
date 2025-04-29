@@ -133,6 +133,36 @@ pub fn conjugate_gradient(ff: &mut ForceField, params: CGParams) -> rdkit_core::
     Ok(energy)
 }
 
+// ---------------------------------------------------------------------------
+// High-level convenience wrapper --------------------------------------------
+
+/// Enumeration of the available optimisation algorithms with embedded
+/// parameter structs (allowing callers to tweak only what they need).
+#[non_exhaustive]
+pub enum OptimMethod {
+    SteepestDescent(Option<SDParams>),
+    ConjugateGradient(Option<CGParams>),
+}
+
+
+impl Default for OptimMethod {
+    fn default() -> Self {
+        Self::ConjugateGradient(None)
+    }
+}
+
+/// Optimise a molecular geometry stored in the given `ForceField`.  Returns
+/// the final energy.
+pub fn optimize_geometry(
+    ff: &mut ForceField,
+    method: impl Into<OptimMethod>,
+) -> rdkit_core::Result<f64> {
+    match method.into() {
+        OptimMethod::SteepestDescent(p) => steepest_descent(ff, p.unwrap_or_default()),
+        OptimMethod::ConjugateGradient(p) => conjugate_gradient(ff, p.unwrap_or_default()),
+    }
+}
+
 /// Run a basic steepest-descent optimisation.  This is a numerical algorithm
 /// intended as a temporary scaffold until analytic derivatives are hooked in.
 ///
@@ -332,5 +362,23 @@ mod tests {
         // CG should converge to low energy (~0 within a few kcal/mol)
         assert!(e_final < 1.0);
         assert!(e_final < e_initial);
+    }
+
+    #[test]
+    fn optimize_geometry_wrapper() {
+        let mut ff = ForceField::default();
+        let o = ff.add_atom("O_3", geometry::Point3D(0.0, 0.0, 0.0));
+        let h1 = ff.add_atom("H_", geometry::Point3D(1.4, 0.0, 0.0));
+        let h2 = ff.add_atom("H_", geometry::Point3D(-0.2, 1.1, 0.0));
+
+        ff.add_bond(o, h1, 1.0);
+        ff.add_bond(o, h2, 1.0);
+        ff.add_angle(h1, o, h2, 1.0, 1.0);
+
+        let e0 = ff.total_energy().unwrap();
+
+        let e = optimize_geometry(&mut ff, OptimMethod::default()).unwrap();
+        assert!(e < e0);
+        assert!(e < 1.0);
     }
 }
