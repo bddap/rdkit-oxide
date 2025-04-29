@@ -149,6 +149,54 @@ Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 ------------------------------------------------------------------------------
 
+## GraphMol – ForceFieldHelpers
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/ForceFieldHelpers/catch_tests.cpp` | Smoke tests ensuring helper factories (`UFFOptimizeMolecule`, `MMFFOptimizeMolecule`) run without errors. |
+| `GraphMol/ForceFieldHelpers/UFF/testUFFHelpers.cpp` | Builds UFF force field on diverse molecules, checks energy convergence; regression for unsupported atom types. |
+| `GraphMol/ForceFieldHelpers/MMFF/testMMFFHelpers.cpp` | Similar coverage for MMFF helpers; compares energies of MMFF94 vs MMFF94s. |
+| `GraphMol/ForceFieldHelpers/MMFF/testMultiThread.cpp` | Thread-safety test: optimise many molecules in parallel, compare energies. |
+| `GraphMol/ForceFieldHelpers/CrystalFF/testCrystalFF.cpp` | Validates torsion preference contrib counts and energies for ring systems. |
+
+------------------------------------------------------------------------------
+
+## GraphMol – RGroupDecomposition
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/RGroupDecomposition/testRGroupInternals.cpp` | Unit tests for scoring metrics, atom alignment, prune heuristics. |
+| `GraphMol/RGroupDecomposition/testRGroupDecomp.cpp` | End-to-end decomposition of example dataset; verifies group counts, labels, and mapping. |
+
+------------------------------------------------------------------------------
+
+## SimDivPickers
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `SimDivPickers/catch_tests.cpp` | Tests distance-matrix helper, invalid parameters, and picker base class behaviour. |
+| `SimDivPickers/testPickers.cpp` | Runs MaxMin, Leader, Hierarchical pickers on random matrices; asserts uniqueness and threshold adherence. |
+
+------------------------------------------------------------------------------
+
+## Numerics
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `Numerics/testMatrices.cpp` | Determinant, inverse, and Cholesky correctness for Square/Symm matrices. |
+| `Numerics/testConrec.cpp` | CONREC contour output segment count vs reference. |
+| `Numerics/Alignment/testAlignment.cpp` | Kabsch alignment RMSD and rotation orthogonality. |
+| `Numerics/Optimizer/testOptimizer.cpp` | Rosenbrock minimisation with BFGS reaches expected minimum. |
+| `Numerics/EigenSolvers/testEigenSolvers.cpp` | Power iteration eigenvalue error < 1e-6 on random symmetric matrices. |
+
+------------------------------------------------------------------------------
+
+## Miscellaneous
+
+Minor tests in other sub-folders (MolStandardize, MolDraw2D, Fuzz harnesses) are not required for Rust port; they are acknowledged here but not catalogued in detail.
+
+------------------------------------------------------------------------------
+
 ## GraphMol – DistGeomHelpers
 
 | File | Highlights | Purpose |

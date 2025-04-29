@@ -60,11 +60,11 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Reactions (tests.md)
     - [x] FMCS (tests.md)
     - [x] DistGeomHelpers (tests.md)
-    - [ ] ForceFieldHelpers
-    - [ ] RGroupDecomposition
-  - [ ] SimDivPickers tests
-  - [ ] Numerics tests
-  - [ ] Misc/other modules tests
+    - [x] ForceFieldHelpers (tests.md)
+    - [x] RGroupDecomposition (tests.md)
+    - [x] SimDivPickers tests (tests.md)
+    - [x] Numerics tests (tests.md)
+    - [x] Misc/other modules tests (tests.md)
 
 ## Stage 3 – Relationship graph (pending)
 
@@ -82,4 +82,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – ForceFieldHelpers tests catalogue.”**
+Currently working on: **“Stage 2.5 – Final review and wrap-up.”**
