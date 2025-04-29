@@ -13,7 +13,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Catalogs
   - [x] Catalogs (legacy-rdkit-map/Catalogs.md)
   - [x] ChemicalFeatures (legacy-rdkit-map/ChemicalFeatures.md)
-  - [ ] DataManip
+  - [x] DataManip (legacy-rdkit-map/DataManip.md)
   - [ ] DataStructs
   - [ ] DistGeom
   - [ ] Features
@@ -53,4 +53,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `DataManip` module.”**
+Currently working on: **“Stage 2 – Detailed map for `DataStructs` module.”**
