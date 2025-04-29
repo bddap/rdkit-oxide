@@ -23,8 +23,8 @@ tests to Rust.
 
 ------------------------------------------------------------------------------
 
-Pending sections: DataStructs, Geometry/DistGeom, ForceField, GraphMol, SimDivPickers, Numerics, Misc.
-Completed: RDGeneral, DataStructs
+Completed sections so far: RDGeneral, DataStructs, Geometry/DistGeom, ForceField, GraphMol (all submodules), SimDivPickers, Numerics.  
+Remaining sections: only minor *Miscellaneous* tests which are out-of-scope for the Rust port and therefore documented tersely at the end of this file.
 
 ------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ Completed: RDGeneral, DataStructs
 | `Geometry/testTransforms.cpp` | Multiple `TEST_ASSERT` blocks cover quaternion rotation matrices, axis–angle conversions, 2D/3D transform composition, and inversion accuracy. | Verifies `Transform3D` math. |
 | `DistGeom/testDistGeom.cpp` | `test1()` – triangle smoothing of bounds matrix with analytical expectations.<br>`testIssue216()` – reproduces bug #216 ensuring initial coordinate generation from symmetric matrix yields unit edge lengths.<br>Main() runs and prints via RDLog. | Core validation of distance-geometry numeric routines (`BoundsMatrix`, `computeInitialCoords`). |
 
-Pending sections: ForceField, GraphMol, SimDivPickers, Numerics, Misc.
+—
 ------------------------------------------------------------------------------
 
 ## ForceField
@@ -49,7 +49,6 @@ Pending sections: ForceField, GraphMol, SimDivPickers, Numerics, Misc.
 | `ForceField/UFF/testUFFForceField.cpp` | `test1()` – low-level ForceField API distances, angle calculation.<br>`testUFFBuilder()` – build UFF force field for benzene, run minimization, check energy (lines ~200).<br>`testUFFConstraints()` – position, torsion, distance constraints (≥400). | Regression coverage for UFF energy terms and builder utilities. |
 | `ForceField/MMFF/testMMFFForceField.cpp` | `testBasics()` – parameter loading from CSV, atom type assignments.<br>`testOptimization()` – minimize chloroethane and compare final energy to expected.<br>`testMultiThread()` – ensure thread-safety by optimizing 50 molecules in parallel (guarded by `RDK_THREADSAFE_SSS`). | Mirrors UFF tests but for MMFF94; ensures variant parameter selection (94 vs 94s) yields correct energies. |
 
-Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 
 ------------------------------------------------------------------------------
@@ -208,5 +207,5 @@ Minor tests in other sub-folders (MolStandardize, MolDraw2D, Fuzz harnesses) are
 
 ------------------------------------------------------------------------------
 
-Pending sections: DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.
+
 

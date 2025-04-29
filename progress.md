@@ -44,14 +44,14 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
   - [ ] Recursively expand the checklist for each sub-module once its parent summary is done. (ongoing as we dive deeper)
 
-## Stage 2.5 – Unit-test catalogue (in progress 🛠️)
+## Stage 2.5 – Unit-test catalogue (complete ✅)
 
-- [ ] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
+- [x] Enumerate every unit test, with location and explanation, into `legacy-rdkit-map/tests.md`.
   - [x] RDGeneral tests (legacy-rdkit-map/tests.md)
   - [x] DataStructs tests (legacy-rdkit-map/tests.md)
   - [x] Geometry & DistGeom tests (legacy-rdkit-map/tests.md)
   - [x] ForceField tests (legacy-rdkit-map/tests.md)
-  - [ ] GraphMol core + submodules tests
+  - [x] GraphMol core + submodules tests
     - [x] Core basics (tests.md)
     - [x] Chirality & Stereo (tests.md)
     - [x] FileParsers (tests.md)
