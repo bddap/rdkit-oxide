@@ -127,8 +127,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Transformation matrices / quaternion helpers (crates/geometry).
 
 - [ ] forcefield-core expansion
-  - [ ] Torsion (dihedral) term energy + gradient.
-  - [x] Torsion (dihedral) term energy + gradient (crates/forcefield-core).
+  - [x] Torsion (dihedral) term energy + numerical gradient (crates/forcefield-core).
+  - [ ] Analytic per-atom gradient for torsion terms.
   - [x] Inversion term energy + gradient (crates/forcefield-core).
   - [x] van-der-Waals / Lennard-Jones term (generic LJ 12-6) + derivative (crates/forcefield-core).
   - [x] Analytic per-atom gradient for bond-stretch terms (crates/forcefield-core/field.rs).
@@ -163,19 +163,12 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Recent updates
 
-- Implemented **analytic per-atom gradient for bond-stretch terms** in `crates/forcefield-core/src/field.rs` (`ForceField::bond_gradients`).
-  - Added thorough unit test comparing against finite-difference gradients.
-  - Updated documentation with clearer chain-rule derivation.
-
-- All tests (`cargo test --workspace`) pass.
-
-## Recent updates
-
-- Added analytic derivatives for bond‐stretch and angle‐bend energy terms in `crates/forcefield-core/src/lib.rs` (`bond_stretch_energy_derivative`, `angle_bend_energy_derivative`).
-- Added unit tests verifying agreement with finite‐difference derivatives.
+- Added analytic per-atom gradient implementations:
+  - Bond-stretch (`ForceField::bond_gradients`).
+  - Angle-bend (`ForceField::angle_gradients`).
+  - Integrated analytic gradients into optimisation engine (`optim.rs`).
+- All workspace tests and clippy lints pass.
 
 ---
-
-Currently working on: **Stage 5 – Implement analytic per-atom gradient for angle-bend terms**
 
 Currently working on: **Stage 5 – Implement torsion analytic gradients**
