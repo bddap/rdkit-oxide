@@ -58,7 +58,7 @@ impl MolBuilder {
                 Element::P => 5,
                 Element::S => 6,
                 Element::Cl | Element::Br | Element::I => 1,
-            } + atom.explicit_h_count as u8;
+            } + atom.explicit_h_count;
 
             if *v > max_v {
                 return Err(crate::RdError::ValenceError(idx));
