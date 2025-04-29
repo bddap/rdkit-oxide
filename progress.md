@@ -69,6 +69,12 @@ This file is updated incrementally to survive context compression.  Each top-lev
 ## Stage 3 – Relationship graph (pending)
 
 - [ ] Create `legacy-rdkit-map/map.md` with text graph of symbol relationships.
+  - [x] Skeleton graph with root module examples (commit b02e15a^..)
+  - [ ] Expand DataStructs relationships
+  - [ ] Expand GraphMol core relationships
+  - [ ] Expand Fingerprints & Descriptors relationships
+  - [ ] Expand ForceField relationships
+  - [ ] Expand DistGeomHelpers & ForceFieldHelpers relationships
 
 ## Stage 4 – Rust rewrite plan (pending)
 
@@ -84,4 +90,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 2.5 status: complete ✅
 
-Currently working on: **“Stage 3 – Relationship graph.”**
+Currently working on: **“Stage 3 – Expand DataStructs relationships.”**
