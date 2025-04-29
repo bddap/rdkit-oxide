@@ -3,6 +3,7 @@ members = [
     "crates/rdkit-core",
     "crates/datastructs",
     "crates/forcefield-uff",
+    "crates/geometry",
     "crates/forcefield-core",
 ]
 # Use the latest resolver; this requires Rust 1.51+
