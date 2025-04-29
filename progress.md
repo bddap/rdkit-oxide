@@ -15,7 +15,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] ChemicalFeatures (legacy-rdkit-map/ChemicalFeatures.md)
   - [x] DataManip (legacy-rdkit-map/DataManip.md)
   - [x] DataStructs (legacy-rdkit-map/DataStructs.md)
-  - [ ] DistGeom
+  - [x] DistGeom (legacy-rdkit-map/DistGeom.md)
   - [ ] Features
   - [ ] ForceField
   - [ ] Geometry
@@ -53,4 +53,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `DistGeom` module.”**
+Currently working on: **“Stage 2 – Detailed map for `Features` module.”**
