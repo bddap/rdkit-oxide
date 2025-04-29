@@ -34,7 +34,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [-] JavaWrappers (skip – no Rust port)
   - [-] ML (skip – utility machine-learning helpers, not needed for Rust port)
   - [-] MinimalLib (skip – wasm viewer only)
-  - [ ] Numerics
+  - [x] Numerics (legacy-rdkit-map/Numerics.md)
   - [-] PgSQL (skip – no Rust port)
   - [ ] Query
   - [-] RDBoost (skip – no Rust port)
@@ -64,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for Numerics.”**
+Currently working on: **“Stage 2 – Detailed map for Query.”**
