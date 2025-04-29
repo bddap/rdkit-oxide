@@ -37,6 +37,27 @@ impl<'a> Lexer<'a> {
         }
         val
     }
+
+    /// Reads a variable-length unsigned integer (≥ two digits) following a
+    /// percent sign in a ring closure. Returns `None` if the next two
+    /// characters are not digits, in which case the iterator will later abort
+    /// via an invalid token.
+    fn read_variable_number(&mut self) -> Option<u32> {
+        // Require at least two digits per SMILES spec.
+        let mut val: Option<u32> = None;
+        for _ in 0..2 {
+            let c = self.bump()?.to_digit(10)?;
+            val = Some(val.unwrap_or(0) * 10 + c);
+        }
+        // Consume any additional digits.
+        while let Some(c) = self.peek() {
+            if let Some(d) = c.to_digit(10) {
+                self.bump();
+                val = Some(val.unwrap() * 10 + d);
+            } else { break }
+        }
+        val
+    }
 }
 
 impl<'a> Iterator for Lexer<'a> {
@@ -60,11 +81,9 @@ impl<'a> Iterator for Lexer<'a> {
                         Tok::Ring(idx, Some(c))
                     }
                     Some('%') => {
-                        // multi-digit ring index: e.g. "C-%10"
                         self.bump(); // consume '%'
-                        let d1 = self.bump()?.to_digit(10)?;
-                        let d2 = self.bump()?.to_digit(10)?;
-                        Tok::Ring(10 * d1 + d2, Some(c))
+                        let idx = self.read_variable_number()?; // at least two digits
+                        Tok::Ring(idx, Some(c))
                     }
                     _ => Tok::Bond(c),
                 }
@@ -73,10 +92,8 @@ impl<'a> Iterator for Lexer<'a> {
             // Ring closures without explicit bond ------------------------
             '0'..='9' => Tok::Ring(self.read_number(c), None),
             '%' => {
-                // Multi-digit ring index %ab where a,b∈[0-9]
-                let d1 = self.bump()?.to_digit(10)?;
-                let d2 = self.bump()?.to_digit(10)?;
-                Tok::Ring(10 * d1 + d2, None)
+                let idx = self.read_variable_number()?; // consume ≥2 digits
+                Tok::Ring(idx, None)
             }
 
             // Bracket atom ----------------------------------------------
@@ -95,8 +112,30 @@ impl<'a> Iterator for Lexer<'a> {
                 Tok::Element(&self.src[start..self.pos])
             }
 
-            // Aromatic single-letter lower-case atoms -------------------
-            'c' | 'n' | 'o' | 's' | 'p' | 'b' => Tok::Element(&self.src[self.pos - 1..self.pos]),
+            // Aromatic atoms: single-letter or special two-letter (`se`, `as`)
+            'c' | 'n' | 'o' | 'p' | 'b' => {
+                Tok::Element(&self.src[self.pos - 1..self.pos])
+            }
+
+            's' => {
+                if matches!(self.peek(), Some('e')) {
+                    self.bump();
+                    let start = self.pos - 2; // include 's' and 'e'
+                    Tok::Element(&self.src[start..self.pos])
+                } else {
+                    Tok::Element(&self.src[self.pos - 1..self.pos])
+                }
+            }
+
+            'a' => {
+                if matches!(self.peek(), Some('s')) {
+                    self.bump();
+                    let start = self.pos - 2;
+                    Tok::Element(&self.src[start..self.pos])
+                } else {
+                    return None; // invalid: 'a' alone not allowed
+                }
+            }
 
             // Dot separator between disconnected components -------------
             '.' => Tok::Bond('.'),
@@ -130,6 +169,10 @@ mod tests {
         let toks: Vec<_> = Lexer::new("C-%12CCCC%12").collect();
         // Expect first Ring token carries '-' bond and idx 12
         assert!(matches!(toks[1], Tok::Ring(12, Some('-'))));
+
+        // Very large ring index > 99 (three-digit) encoded with %123
+        let toks: Vec<_> = Lexer::new("C-%123CCCC%123").collect();
+        assert!(matches!(toks[1], Tok::Ring(123, Some('-'))));
     }
 
     #[test]
@@ -146,6 +189,17 @@ mod tests {
             _ => None,
         }).collect();
         assert_eq!(elems, expected);
+    }
+
+    #[test]
+    fn aromatic_two_letter_lowercase() {
+        // validate 'se' token
+        let toks: Vec<_> = Lexer::new("c1ccsecc1").collect();
+        assert!(toks.iter().any(|t| matches!(t, Tok::Element("se"))));
+
+        // validate 'as'
+        let toks: Vec<_> = Lexer::new("c1ccascc1").collect();
+        assert!(toks.iter().any(|t| matches!(t, Tok::Element("as"))));
     }
 
     #[test]
