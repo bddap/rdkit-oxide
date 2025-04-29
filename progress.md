@@ -137,7 +137,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Minimisation / optimisation engine
     - [x] Scaffold SDParams and steepest_descent placeholder (crates/forcefield-core/optim.rs).
     - [x] Flesh out gradient calculation and update coordinates (steepest descent implemented).
-    - [ ] Add conjugate-gradient or integrate `argmin` crate.
+    - [x] Add simple Polak–Ribiere conjugate-gradient implementation (crates/forcefield-core/optim.rs).
     - [ ] Provide `optimize_geometry()` helper.
 
 - [ ] Unit-test translation – ForceField/UFF
@@ -159,4 +159,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] Added central finite-difference gradient, simple backtracking line search, RMS-gradient convergence.
    - [x] Unit test on distorted water molecule.
 
-Currently working on: **Stage 5 – Minimisation engine – conjugate-gradient / optimisation improvements**
+Currently working on: **Stage 5 – Minimisation engine – expose optimize_geometry() helper & integrate into forcefield-core**
