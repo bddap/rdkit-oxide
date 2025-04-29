@@ -10,23 +10,22 @@ This file is updated incrementally to survive context compression.  Each top-lev
 ## Stage 2 – In-depth maps (pending)
 
 - [ ] Produce detailed symbol maps for every first-level module in `rdkit/Code/`:
-  - [ ] Catalogs
   - [x] Catalogs (legacy-rdkit-map/Catalogs.md)
   - [x] ChemicalFeatures (legacy-rdkit-map/ChemicalFeatures.md)
   - [x] DataManip (legacy-rdkit-map/DataManip.md)
   - [x] DataStructs (legacy-rdkit-map/DataStructs.md)
   - [x] DistGeom (legacy-rdkit-map/DistGeom.md)
   - [x] Features (legacy-rdkit-map/Features.md)
-  - [ ] ForceField
+  - [x] ForceField (legacy-rdkit-map/ForceField.md)
   - [ ] Geometry
   - [ ] GraphMol
-  - [ ] JavaWrappers (documentation only – no Rust port)
+  - [-] JavaWrappers (skip – no Rust port)
   - [ ] ML
   - [ ] MinimalLib
   - [ ] Numerics
-  - [ ] PgSQL
+  - [-] PgSQL (skip – no Rust port)
   - [ ] Query
-  - [ ] RDBoost (documentation only – no Rust port)
+  - [-] RDBoost (skip – no Rust port)
   - [ ] RDGeneral
   - [ ] RDStreams
   - [ ] SimDivPickers
@@ -53,4 +52,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `ForceField` module.”**
+Currently working on: **“Stage 2 – Detailed map for `Geometry` module.”**
