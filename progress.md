@@ -18,7 +18,18 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Features (legacy-rdkit-map/Features.md)
   - [x] ForceField (legacy-rdkit-map/ForceField.md)
   - [x] Geometry (legacy-rdkit-map/Geometry.md)
-  - [ ] GraphMol
+  - [x] GraphMol (legacy-rdkit-map/GraphMol.md)
+    - [ ] Core Atom/Bond/ROMol
+    - [ ] FileParsers
+    - [ ] Fingerprints
+    - [ ] Descriptors
+    - [ ] Substructure search
+    - [ ] Reaction chemistry
+    - [ ] Depictor
+    - [ ] Stereochemistry & CIPLabeler
+    - [ ] FilterCatalog
+    - [ ] FMCS
+    - [ ] DistGeomHelpers & ForceFieldHelpers
   - [-] JavaWrappers (skip – no Rust port)
   - [ ] ML
   - [ ] MinimalLib
@@ -52,4 +63,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` module (root summary – submodules will be split later).”**
+Currently working on: **“Stage 2 – Detailed map for `GraphMol` core Atom/Bond/ROMol.”**
