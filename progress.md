@@ -52,9 +52,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Geometry & DistGeom tests (legacy-rdkit-map/tests.md)
   - [x] ForceField tests (legacy-rdkit-map/tests.md)
   - [ ] GraphMol core + submodules tests
-    - [ ] Core basics
-    - [ ] Chirality & Stereo
-    - [ ] FileParsers
+    - [x] Core basics (tests.md)
+    - [x] Chirality & Stereo (tests.md)
+    - [x] FileParsers (tests.md)
     - [ ] Fingerprints
     - [ ] Descriptors
     - [ ] Reactions

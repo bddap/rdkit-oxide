@@ -69,3 +69,36 @@ Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 ------------------------------------------------------------------------------
 
+## GraphMol – Core basics
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/test1.cpp` | `test1()` – atom/bond creation and sanitizer; `testIssue262()` – aromatic bridge kekulization regression. | Smoke tests for fundamental graph classes. |
+| `GraphMol/testPickler.cpp` | `test1()` – pickle/unpickle for canonical SMILES set, ensuring identical canonical SMILES; `test2()` – property and query pickling. |
+| `GraphMol/testPicklerGlobalSettings.cpp` | Exercises global `MolPickler` flags, checks size reductions and deprecation warnings. |
+| `GraphMol/testMolBundle.cpp` | Serialisation and substructure match of `MolBundle`. |
+| `GraphMol/testSGroup.cpp` | SGroup parsing and round-trip write of attachment data. |
+| `GraphMol/test-valgrind.cpp` | Leak detection harness; no assertions. |
+
+------------------------------------------------------------------------------
+
+## GraphMol – Chirality & Stereo
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/testChirality.cpp` | CIP labelling from molfiles, wedge/dash generation, stereo inversion, and multiple issue regressions. |
+| `GraphMol/CIPLabeler/catch_tests.cpp` | Catch2 cases for isotope priority, duplicate bond handling, pseudo-asymmetric centres. |
+
+------------------------------------------------------------------------------
+
+## GraphMol – FileParsers
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/FileParsers/catch_tests.cpp` | V3000 queries, extended stereo tags, mapNum retention, group aliases. |
+| `GraphMol/ChemTransforms/testChemTransforms.cpp` | Transform tests relying on correct mol parsing. |
+
+------------------------------------------------------------------------------
+
+Pending sections: GraphMol Fingerprints, Descriptors, Reactions, FMCS, DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.
+
