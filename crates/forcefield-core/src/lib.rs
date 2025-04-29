@@ -202,6 +202,30 @@ pub fn torsion_energy_derivative(v_barrier: f64, periodicity: u32, phi: f64, phi
 }
 
 // ---------------------------------------------------------------------------
+// Public API – inversion (improper torsion / out-of-plane)
+// ---------------------------------------------------------------------------
+
+/// Simple harmonic inversion potential used for out-of-plane bending around
+/// trigonal centres (improper torsions).
+///
+/// Formula (harmonic):
+/// ```text
+/// E = ½ k (χ − χ₀)²
+/// ```
+/// where `χ` is the out-of-plane angle (*radians*).  Typically `χ₀ = 0` for planar
+/// atoms.
+#[inline]
+pub fn inversion_energy(k_chi: f64, chi: f64, chi0: f64) -> f64 {
+    0.5 * k_chi * (chi - chi0).powi(2)
+}
+
+/// Derivative ∂E/∂χ for gradient calculations.
+#[inline]
+pub fn inversion_energy_derivative(k_chi: f64, chi: f64, chi0: f64) -> f64 {
+    k_chi * (chi - chi0)
+}
+
+// ---------------------------------------------------------------------------
 // Unit tests – basic sanity checks versus reference C++ values
 // ---------------------------------------------------------------------------
 
@@ -257,5 +281,23 @@ mod tests {
         let phi_max = PI / 3.0; // 60°
         let e_max = torsion_energy(v, n, phi_max, phi0);
         assert_relative_eq!(e_max, v, epsilon = 1e-12);
+    }
+
+    #[test]
+    fn inversion_energy_planar() {
+        // Planar chi should have zero energy when chi = chi0
+        let k = 10.0;
+        let chi0 = 0.0;
+        let e = inversion_energy(k, chi0, chi0);
+        assert_relative_eq!(e, 0.0, epsilon = 1e-12);
+
+        // Distort to 0.2 rad (~11.5°)
+        let chi = 0.2;
+        let e_distort = inversion_energy(k, chi, chi0);
+        assert!(e_distort > 0.0);
+
+        let deriv = inversion_energy_derivative(k, chi, chi0);
+        // Derivative should be positive for chi > chi0
+        assert!(deriv > 0.0);
     }
 }
