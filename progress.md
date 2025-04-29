@@ -96,7 +96,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
  - [ ] Configure continuous testing (`cargo test --workspace`) in CI script (future)
    - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto, bitwise ops, fold
  - [x] Port ExplicitBitVect core API (+ unit tests)
- - [x] Translate first Catch2 datastructs tests to Rust (SparseBitVect limit case)
+ - [x] Translate first Catch2 datastructs tests to Rust (SparseBitVect limit case, base64 round-trip)
  - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
  - [ ] Document workspace `README.md`
 
