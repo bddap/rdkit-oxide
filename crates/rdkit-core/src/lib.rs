@@ -10,6 +10,9 @@ pub enum RdError {
 
     #[error("Unimplemented feature: {0}")]
     Unimplemented(&'static str),
+
+    #[error("Valence error on atom index {0}")]
+    ValenceError(usize),
 }
 
 /// Helper type alias.

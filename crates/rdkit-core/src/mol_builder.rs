@@ -35,7 +35,36 @@ impl MolBuilder {
 
     /// Finalise edits; sanitisation stub for now.
     pub fn finish(self) -> crate::Result<Mol> {
-        // TODO: ring perception, valence checks, etc.
+        // --- Simple valence check ---------------------------------------
+        let mut valence = vec![0u8; self.atoms.len()];
+        for bond in &self.bonds {
+            let order = match bond.order {
+                BondOrder::Single => 1,
+                BondOrder::Double => 2,
+                BondOrder::Triple => 3,
+                BondOrder::Aromatic => 1, // treat as single for valence sum
+            };
+            valence[bond.a] += order;
+            valence[bond.b] += order;
+        }
+
+        for (idx, (atom, v)) in self.atoms.iter().zip(valence.iter()).enumerate() {
+            let max_v = match atom.element {
+                Element::H => 1,
+                Element::C => 4,
+                Element::N => 3,
+                Element::O => 2,
+                Element::F => 1,
+                Element::P => 5,
+                Element::S => 6,
+                Element::Cl | Element::Br | Element::I => 1,
+            } + atom.explicit_h_count as u8;
+
+            if *v > max_v {
+                return Err(crate::RdError::ValenceError(idx));
+            }
+        }
+
         Ok(Mol { atoms: self.atoms, bonds: self.bonds })
     }
 }
