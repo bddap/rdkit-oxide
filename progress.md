@@ -58,7 +58,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Fingerprints (tests.md)
     - [x] Descriptors (tests.md)
     - [x] Reactions (tests.md)
-    - [ ] FMCS
+    - [x] FMCS (tests.md)
     - [ ] DistGeomHelpers
     - [ ] ForceFieldHelpers
     - [ ] RGroupDecomposition
@@ -82,4 +82,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – GraphMol tests catalogue.”**
+Currently working on: **“Stage 2.5 – DistGeomHelpers tests catalogue.”**

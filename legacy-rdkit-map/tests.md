@@ -140,7 +140,16 @@ Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 ------------------------------------------------------------------------------
 
+## GraphMol – FMCS
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/FMCS/testFMCS_Unit.cpp` | Unit tests covering `findMCS()` with different compare modes, RingMatchesRingOnly, CompleteRingsOnly, timeout behaviour, and SMARTS output correctness. |
+| `GraphMol/FMCS/Test/testFMCS.cpp` | Large regression against SDF datasets; compares SMARTS size and runtime (disabled on CI by default). |
+
 ------------------------------------------------------------------------------
 
-Pending sections: GraphMol Fingerprints, Descriptors, Reactions, FMCS, DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.
+------------------------------------------------------------------------------
+
+Pending sections: DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.
 
