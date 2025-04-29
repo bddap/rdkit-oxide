@@ -353,6 +353,73 @@ mod tests {
             assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
         }
     }
+
+    #[test]
+    fn inversion_gradient_matches_fd() {
+        // Simple improper torsion: central atom at origin, basal plane in xy, out-of-plane atom slightly off.
+        let mut ff = ForceField::default();
+
+        use geometry::Point3D;
+
+        let j = ff.add_atom("C_3", Point3D(0.0, 0.0, 0.0));
+        let k = ff.add_atom("C_3", Point3D(1.0, 0.0, 0.0));
+        let l = ff.add_atom("C_3", Point3D(0.0, 1.0, 0.0));
+        let i = ff.add_atom("C_3", Point3D(0.0, 0.0, 0.2)); // out-of-plane
+
+        let k_chi = 5.0;
+        let chi0 = 0.0;
+        ff.add_inversion(i, j, k, l, k_chi, chi0);
+
+        let g_ana = ff.inversion_gradients();
+
+        // Finite difference
+        fn numerical_grad(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<Point3D>> {
+            enum Axis { X, Y, Z }
+            fn coord_mut<'a>(p: &'a mut Point3D, axis: &Axis) -> &'a mut f64 {
+                match axis {
+                    Axis::X => &mut p.0,
+                    Axis::Y => &mut p.1,
+                    Axis::Z => &mut p.2,
+                }
+            }
+            fn fd_comp(ff: &mut ForceField, atom_idx: usize, axis: Axis, h: f64) -> rdkit_core::Result<f64> {
+                let orig;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    orig = *coord;
+                    *coord = orig + h;
+                }
+                let e_plus = ff.total_energy()?;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig - h;
+                }
+                let e_minus = ff.total_energy()?;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig;
+                }
+                Ok((e_plus - e_minus) / (2.0 * h))
+            }
+            let natoms = ff.atom_count();
+            let mut grad = Vec::with_capacity(natoms);
+            for idx in 0..natoms {
+                let gx = fd_comp(ff, idx, Axis::X, h)?;
+                let gy = fd_comp(ff, idx, Axis::Y, h)?;
+                let gz = fd_comp(ff, idx, Axis::Z, h)?;
+                grad.push(Point3D(gx, gy, gz));
+            }
+            Ok(grad)
+        }
+
+        let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
+
+        for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
+            assert_relative_eq!(ga.0, gf.0, epsilon = 1e-3);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 1e-3);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 1e-3);
+        }
+    }
 }
 
 
@@ -532,6 +599,14 @@ impl ForceField {
             total.2 += g.2;
         }
 
+        // Inversion term -------------------------------------------------
+        let inv_grad = self.inversion_gradients();
+        for (total, g) in grad.iter_mut().zip(inv_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
         Ok(grad)
     }
 
@@ -566,6 +641,118 @@ impl ForceField {
             grad[b_idx].0 -= g.x();
             grad[b_idx].1 -= g.y();
             grad[b_idx].2 -= g.z();
+        }
+
+        grad
+    }
+
+    /// Analytic gradients for improper torsion / inversion terms.
+    pub fn inversion_gradients(&self) -> Vec<geometry::Point3D> {
+        use geometry::{Point3D, Vector3D};
+
+        let mut grad = vec![Point3D(0.0, 0.0, 0.0); self.atom_count()];
+
+        const EPS: f64 = 1e-8;
+
+        for inv in &self.inversions {
+            let i_idx = inv.i.0; // out-of-plane atom
+            let j_idx = inv.j.0; // central atom
+            let k_idx = inv.k.0;
+            let l_idx = inv.l.0;
+
+            let p_i = self.atoms[i_idx].coord;
+            let p_j = self.atoms[j_idx].coord;
+            let p_k = self.atoms[k_idx].coord;
+            let p_l = self.atoms[l_idx].coord;
+
+            // Unit vectors rJI, rJK, rJL (from central j)
+            let mut r_ji: Vector3D = p_i - p_j;
+            let mut r_jk: Vector3D = p_k - p_j;
+            let mut r_jl: Vector3D = p_l - p_j;
+
+            let d_ji = r_ji.norm();
+            let d_jk = r_jk.norm();
+            let d_jl = r_jl.norm();
+
+            if d_ji < EPS || d_jk < EPS || d_jl < EPS {
+                continue;
+            }
+
+            r_ji = r_ji / d_ji;
+            r_jk = r_jk / d_jk;
+            r_jl = r_jl / d_jl;
+
+            // Normal vector to plane (j,i,k)
+            let mut n = (-r_ji).cross(r_jk);
+            let n_len = n.norm();
+            if n_len < EPS {
+                continue;
+            }
+            n = n / n_len;
+
+            let cos_y = clip_to_one(n.dot(r_jl));
+            let sin_y_sq = 1.0 - cos_y * cos_y;
+            let sin_y = sin_y_sq.max(0.0).sqrt();
+
+            // Angle between ji and jk
+            let cos_theta = clip_to_one(r_ji.dot(r_jk));
+            let sin_theta_sq = 1.0 - cos_theta * cos_theta;
+            let sin_theta = sin_theta_sq.max(0.0).sqrt();
+
+            // chi (out-of-plane) computed via asin(cos_y)
+            let chi = cos_y.asin();
+
+            // dE/dchi (harmonic)
+            let d_e_dchi = inv.k_chi * (chi - inv.chi0);
+
+            // Convert to dE/dW sign consistent with RDKit (W=chi)
+            let d_e_dw = d_e_dchi;
+
+            // Helper cross products
+            let t1 = r_jl.cross(r_jk);
+            let t2 = r_ji.cross(r_jl);
+            let t3 = r_jk.cross(r_ji);
+
+            let term1 = sin_y * sin_theta;
+            if term1.abs() < EPS {
+                continue;
+            }
+            let term2 = cos_y / (sin_y * sin_theta_sq.max(EPS));
+
+            // tg1, tg3, tg4 as arrays
+            let tg1 = Vector3D::new(
+                (t1.x() / term1 - (r_ji.x() - r_jk.x() * cos_theta) * term2) / d_ji,
+                (t1.y() / term1 - (r_ji.y() - r_jk.y() * cos_theta) * term2) / d_ji,
+                (t1.z() / term1 - (r_ji.z() - r_jk.z() * cos_theta) * term2) / d_ji,
+            );
+            let tg3 = Vector3D::new(
+                (t2.x() / term1 - (r_jk.x() - r_ji.x() * cos_theta) * term2) / d_jk,
+                (t2.y() / term1 - (r_jk.y() - r_ji.y() * cos_theta) * term2) / d_jk,
+                (t2.z() / term1 - (r_jk.z() - r_ji.z() * cos_theta) * term2) / d_jk,
+            );
+            let tg4 = Vector3D::new(
+                (t3.x() / term1 - r_jl.x() * cos_y / sin_y) / d_jl,
+                (t3.y() / term1 - r_jl.y() * cos_y / sin_y) / d_jl,
+                (t3.z() / term1 - r_jl.z() * cos_y / sin_y) / d_jl,
+            );
+
+            // Accumulate
+            grad[i_idx].0 += d_e_dw * tg1.x();
+            grad[i_idx].1 += d_e_dw * tg1.y();
+            grad[i_idx].2 += d_e_dw * tg1.z();
+
+            grad[k_idx].0 += d_e_dw * tg3.x();
+            grad[k_idx].1 += d_e_dw * tg3.y();
+            grad[k_idx].2 += d_e_dw * tg3.z();
+
+            grad[l_idx].0 += d_e_dw * tg4.x();
+            grad[l_idx].1 += d_e_dw * tg4.y();
+            grad[l_idx].2 += d_e_dw * tg4.z();
+
+            // Central atom j gets negative sum
+            grad[j_idx].0 -= d_e_dw * (tg1.x() + tg3.x() + tg4.x());
+            grad[j_idx].1 -= d_e_dw * (tg1.y() + tg3.y() + tg4.y());
+            grad[j_idx].2 -= d_e_dw * (tg1.z() + tg3.z() + tg4.z());
         }
 
         grad
