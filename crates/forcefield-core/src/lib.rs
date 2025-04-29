@@ -226,6 +226,34 @@ pub fn inversion_energy_derivative(k_chi: f64, chi: f64, chi0: f64) -> f64 {
 }
 
 // ---------------------------------------------------------------------------
+// Public API – van-der-Waals (Lennard-Jones 12-6) term
+// ---------------------------------------------------------------------------
+
+/// Compute Lennard-Jones 12-6 potential energy for a pair of atoms.
+///
+/// ```text
+/// E(r) = 4 * epsilon * [ (sigma / r)^12 - (sigma / r)^6 ]
+/// ```
+///
+/// where
+/// * `epsilon` – well depth (kcal/mol)
+/// * `sigma`   – distance at which the potential crosses zero (Å)
+/// * `r`       – inter-atomic distance (Å)
+#[inline]
+pub fn lj_energy(epsilon: f64, sigma: f64, r: f64) -> f64 {
+    let sr6 = (sigma / r).powi(6);
+    4.0 * epsilon * (sr6 * sr6 - sr6)
+}
+
+/// Derivative ∂E/∂r for the LJ potential.
+#[inline]
+pub fn lj_energy_derivative(epsilon: f64, sigma: f64, r: f64) -> f64 {
+    let sr6 = (sigma / r).powi(6);
+    // d/dr E = 4 ε [ -12 σ¹² / r¹³ + 6 σ⁶ / r⁷ ]
+    24.0 * epsilon / r * (2.0 * sr6 * sr6 - sr6)
+}
+
+// ---------------------------------------------------------------------------
 // Unit tests – basic sanity checks versus reference C++ values
 // ---------------------------------------------------------------------------
 
@@ -299,5 +327,23 @@ mod tests {
         let deriv = inversion_energy_derivative(k, chi, chi0);
         // Derivative should be positive for chi > chi0
         assert!(deriv > 0.0);
+    }
+
+    #[test]
+    fn lennard_jones_energy_minimum() {
+        let epsilon = 0.5; // arbitrary
+        let sigma = 3.4;
+        // Minimum at r = 2^(1/6) * sigma
+        let r_min = sigma * 2_f64.powf(1.0 / 6.0);
+        let e_min = lj_energy(epsilon, sigma, r_min);
+        assert_relative_eq!(e_min, -epsilon, epsilon = 1e-12);
+
+        // Derivative zero at minimum
+        let d = lj_energy_derivative(epsilon, sigma, r_min);
+        assert_relative_eq!(d, 0.0, epsilon = 1e-10);
+
+        // Repulsive wall at short distance
+        let e_rep = lj_energy(epsilon, sigma, 0.5 * sigma);
+        assert!(e_rep > 0.0);
     }
 }

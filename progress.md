@@ -130,7 +130,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Torsion (dihedral) term energy + gradient.
   - [x] Torsion (dihedral) term energy + gradient (crates/forcefield-core).
   - [x] Inversion term energy + gradient (crates/forcefield-core).
-  - [ ] van-der-Waals / Lennard-Jones term (UFF parameters) + switch distance.
+  - [x] van-der-Waals / Lennard-Jones term (generic LJ 12-6) + derivative (crates/forcefield-core).
   - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
   - [ ] Aggregate ForceField struct storing particles & computing total energy.
 
@@ -153,4 +153,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [ ] Evaluate `petgraph` or custom graph for molecule.
 
 
-Currently working on: **Stage 5 – forcefield-core: implement van-der-Waals / Lennard-Jones term**
+Currently working on: **Stage 5 – forcefield-core: implement aggregate ForceField struct**
