@@ -16,7 +16,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] DataManip (legacy-rdkit-map/DataManip.md)
   - [x] DataStructs (legacy-rdkit-map/DataStructs.md)
   - [x] DistGeom (legacy-rdkit-map/DistGeom.md)
-  - [ ] Features
+  - [x] Features (legacy-rdkit-map/Features.md)
   - [ ] ForceField
   - [ ] Geometry
   - [ ] GraphMol
@@ -53,4 +53,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `Features` module.”**
+Currently working on: **“Stage 2 – Detailed map for `ForceField` module.”**
