@@ -89,22 +89,65 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 5 – Implementation (in progress 🛠️)
 
- - [ ] Bootstrap Cargo workspace `./`
+ - [x] Bootstrap Cargo workspace `./`
    - [x] root `Cargo.toml` with workspace members (commit <pending>)
    - [x] crates/rdkit-core (error types, invariant macro, basic logging shim)
    - [x] crates/datastructs (BitOps skeleton, ExplicitBitVect stub)
  - [ ] Configure continuous testing (`cargo test --workspace`) in CI script (future)
-   - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto, bitwise ops, fold
+   - [ ] Add GitHub Actions workflow (linux + macOS + windows) running `cargo test` and `cargo clippy -- -D warnings`.
+   - [ ] Cache cargo registry & build artefacts for speed.
+   - [ ] Upload test coverage (grcov) (optional).
+
+ - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto, bitwise ops, fold
  - [x] Port ExplicitBitVect core API (+ unit tests)
  - [x] Translate first Catch2 datastructs tests to Rust (SparseBitVect limit case, base64 round-trip)
  - [x] Resolve clippy nits in datastructs crate (base64 deprecation, needless lifetimes, len/is_empty, tests bool assert)
- - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
+ - [x] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
    - [x] Implement build-time extraction of UFF parameters into new crate `forcefield-uff` (commit <pending>)
    - [x] Auto-generate const parameter map via phf; clippy clean
    - [x] Add simple unit-test (H_ sanity check)
- - [ ] Expose API for bond-stretch & angle-bend energy calculations
+ - [x] Expose API for bond-stretch & angle-bend energy calculations
+   - [x] Implement core formulas in new crate `forcefield-core` (+ unit tests) – `bond_rest_length`, `bond_stretch_energy`, `angle_force_constant`, `angle_bend_energy` (commit <pending>)
  - [ ] Document workspace `README.md`
+   - [ ] Explain crate layout & build instructions.
+   - [ ] Describe code-generation (UFF parameters via build.rs).
+   - [ ] Provide quickstart code snippet (compute energy of water).
+
+# New implementation milestones ------------------------------------------------
+
+- [ ] Datastructs crate – feature parity with C++
+  - [ ] Complete SparseBitVect API and translate associated tests.
+  - [ ] Port RealValueVect and DiscreteValueVect, incl. serialisation.
+  - [ ] Implement FPB fingerprint binary reader (streaming, memory-mapped).
+
+- [ ] Geometry crate (to create)
+  - [ ] Point3D and Vector3D types + basic linear algebra traits.
+  - [ ] Transformation matrices / quaternion helpers.
+
+- [ ] forcefield-core expansion
+  - [ ] Torsion (dihedral) term energy + gradient.
+  - [ ] Inversion term energy + gradient.
+  - [ ] van-der-Waals / Lennard-Jones term (UFF parameters) + switch distance.
+  - [ ] Electrostatic Coulomb term based on GMP_Xi/Hardness (optional).
+  - [ ] Aggregate ForceField struct storing particles & computing total energy.
+
+- [ ] Minimisation / optimisation engine
+  - [ ] Implement steepest-descent and conjugate-gradient algorithms (or integrate `argmin` crate).
+  - [ ] Provide `optimize_geometry()` helper that minimises energy until gradient RMS < threshold.
+
+- [ ] Unit-test translation – ForceField/UFF
+  - [ ] Port `testUFFForceField.cpp` (bond, angle, torsion, vdW) to Rust.
+  - [ ] Regression tests on methane, water, benzene geometries versus C++ energies.
+
+- [ ] GraphMol core datastructs (upcoming major set)
+  - [ ] Atom, Bond enums / structs with properties.
+  - [ ] ROMol graph with adjacency list (uses `petgraph`?)
+  - [ ] Basic sanitisation & valence model.
+
+- [ ] Dependency evaluation / ecosystem
+  - [ ] Decide whether to depend on `nalgebra` vs home-brew algebra.
+  - [ ] Evaluate `petgraph` or custom graph for molecule.
 
 ---
 
-Currently working on: **Stage 5 – Implement bond-stretch & angle-bend energy functions in forcefield-core using generated parameters**
+Currently working on: **Stage 5 – Document workspace `README.md`**
