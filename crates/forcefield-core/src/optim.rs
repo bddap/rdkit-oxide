@@ -1,7 +1,6 @@
 //! Very simple steepest-descent minimiser for the `ForceField`.
 
 use crate::field::ForceField;
-use geometry::{Point3D, Vector3D};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SDParams {
@@ -21,7 +20,7 @@ impl Default for SDParams {
 }
 
 /// Perform steepest-descent directly on Cartesian coordinates.
-pub fn steepest_descent(ff: &mut ForceField, params: SDParams) -> Result<f64, rdkit_core::RdError> {
+pub fn steepest_descent(ff: &mut ForceField, _params: SDParams) -> Result<f64, rdkit_core::RdError> {
     // Placeholder: no gradients yet – just return current energy.
     ff.total_energy()
 }

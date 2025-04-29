@@ -92,6 +92,7 @@ pub struct LjPair {
 }
 
 /// Main container.
+#[derive(Default)]
 pub struct ForceField {
     atoms: Vec<Atom>,
     bonds: Vec<Bond>,
@@ -99,19 +100,6 @@ pub struct ForceField {
     torsions: Vec<Torsion>,
     inversions: Vec<Inversion>,
     lj_pairs: Vec<LjPair>,
-}
-
-impl Default for ForceField {
-    fn default() -> Self {
-        Self {
-            atoms: Vec::new(),
-            bonds: Vec::new(),
-            angles: Vec::new(),
-            torsions: Vec::new(),
-            inversions: Vec::new(),
-            lj_pairs: Vec::new(),
-        }
-    }
 }
 
 impl ForceField {
@@ -139,6 +127,7 @@ impl ForceField {
         });
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn add_torsion(
         &mut self,
         i: AtomIdx,
@@ -203,7 +192,7 @@ impl ForceField {
 
             let vij = i.coord - j.coord;
             let vkj = k.coord - j.coord;
-            let cos_theta = dot(vij, vkj) / (norm(vij) * norm(vkj));
+            let cos_theta = dot_v(vij, vkj) / (norm_v(vij) * norm_v(vkj));
             let theta = clip_to_one(cos_theta).acos();
 
             e += angle_bend_energy(
@@ -253,7 +242,7 @@ impl ForceField {
 // ---------------------------------------------------------------------------
 // Helper geometry functions --------------------------------------------------
 
-use geometry::{dot, norm};
+use geometry::{dot_v, norm_v};
 
 /// Compute dihedral angle (radians) using standard textbook formula.
 fn dihedral_angle(p1: Point3D, p2: Point3D, p3: Point3D, p4: Point3D) -> f64 {

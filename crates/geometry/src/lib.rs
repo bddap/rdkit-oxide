@@ -56,7 +56,7 @@ impl Vector3D {
 
 // --- Operators -------------------------------------------------------------
 
-use std::ops::{Add, Sub, Mul, Neg};
+use std::ops::{Add, Sub, Mul, Neg, Div};
 
 impl Add for Vector3D {
     type Output = Self;
@@ -76,6 +76,13 @@ impl Mul<f64> for Vector3D {
     type Output = Self;
     fn mul(self, rhs: f64) -> Self::Output {
         Self(self.0 * rhs)
+    }
+}
+
+impl Div<f64> for Vector3D {
+    type Output = Self;
+    fn div(self, rhs: f64) -> Self::Output {
+        Self(self.0 / rhs)
     }
 }
 
@@ -162,17 +169,25 @@ impl Point3D {
 
 
 
-impl Add for Point3D {
-    type Output = Point3D;
-    fn add(self, rhs: Point3D) -> Self::Output {
-        Point3D(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
+// Note: arithmetic between two points is undefined in strict geometry terms.
+// We therefore *do not* implement `Add<Point3D>`; subtraction yields a vector
+// via the blanket impl below.
+
+// Produce a Vector3D from point subtraction --------------------------------
+
+impl std::ops::Sub<Point3D> for Point3D {
+    type Output = Vector3D;
+    fn sub(self, rhs: Point3D) -> Self::Output {
+        Vector3D::new(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
     }
 }
 
-impl Sub for Point3D {
+// Translate a point by a vector --------------------------------------------
+
+impl std::ops::Add<Vector3D> for Point3D {
     type Output = Point3D;
-    fn sub(self, rhs: Point3D) -> Self::Output {
-        Point3D(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
+    fn add(self, rhs: Vector3D) -> Self::Output {
+        Point3D(self.0 + rhs.x(), self.1 + rhs.y(), self.2 + rhs.z())
     }
 }
 
@@ -184,6 +199,16 @@ pub fn dot(a: Point3D, b: Point3D) -> f64 {
 /// Length (norm) of the vector represented by the point.
 pub fn norm(v: Point3D) -> f64 {
     (v.0 * v.0 + v.1 * v.1 + v.2 * v.2).sqrt()
+}
+
+/// Dot product of two Vector3D.
+pub fn dot_v(a: Vector3D, b: Vector3D) -> f64 {
+    a.dot(b)
+}
+
+/// Norm of Vector3D.
+pub fn norm_v(v: Vector3D) -> f64 {
+    v.norm()
 }
 
 // ---------------------------------------------------------------------------
@@ -203,13 +228,13 @@ mod tests {
     }
 
     #[test]
-    fn add_sub() {
-        let a = Point3D(1.0, 2.0, 3.0);
-        let b = Point3D(0.5, -1.0, 1.0);
-        let c = a + b;
-        assert_eq!(c, Point3D(1.5, 1.0, 4.0));
-        let d = c - a;
-        assert_eq!(d, b);
+    fn translate_point() {
+        let p = Point3D(1.0, 2.0, 3.0);
+        let v = Vector3D::new(0.5, -1.0, 1.0);
+        let p2 = p + v;
+        assert_eq!(p2, Point3D(1.5, 1.0, 4.0));
+        let back = p2 - p;
+        assert_eq!(back, v);
     }
 
     #[test]
@@ -218,6 +243,17 @@ mod tests {
         assert_relative_eq!(norm(v), 5.0);
         let u = Point3D(1.0, 0.0, 0.0);
         assert_eq!(dot(v, u), 3.0);
+    }
+
+    #[test]
+    fn point_vector_ops() {
+        let p1 = Point3D(1.0, 2.0, 3.0);
+        let p2 = Point3D(2.0, 0.0, 1.0);
+        let v = p1 - p2;
+        assert_eq!(v, Vector3D::new(-1.0, 2.0, 2.0));
+
+        let p3 = p2 + v;
+        assert_eq!(p3, p1);
     }
 
     #[test]
