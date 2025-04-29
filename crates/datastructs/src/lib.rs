@@ -1,6 +1,7 @@
 //! Data structures (bit vectors, sparse vectors, etc.)
 
 use bitvec::prelude::*;
+use base64::prelude::*; // re-export traits for encode/decode
 
 pub mod sparse;
 
@@ -48,6 +49,11 @@ impl ExplicitBitVect {
         self.bits.len()
     }
 
+    /// Returns true if the bit vector contains no set bits.
+    pub fn is_empty(&self) -> bool {
+        self.bits.not_any()
+    }
+
     pub fn set_bit(&mut self, idx: usize) {
         self.bits.set(idx, true);
     }
@@ -93,12 +99,15 @@ impl ExplicitBitVect {
     /// Serialise using bincode and encode as base64 string.
     pub fn to_base64(&self) -> String {
         let bytes = bincode::serialize(self).expect("serialize ExplicitBitVect");
-        base64::encode(bytes)
+        // Use the general-purpose standard base64 engine to avoid deprecated helpers.
+        base64::engine::general_purpose::STANDARD.encode(bytes)
     }
 
     /// Decode from base64 string.
     pub fn from_base64(s: &str) -> Self {
-        let bytes = base64::decode(s).expect("decode base64 ExplicitBitVect");
+        let bytes = base64::engine::general_purpose::STANDARD
+            .decode(s)
+            .expect("decode base64 ExplicitBitVect");
         bincode::deserialize(&bytes).expect("deserialize ExplicitBitVect")
     }
 
@@ -184,28 +193,28 @@ impl ExplicitBitVect {
 
 use std::ops::{BitAnd, BitOr, BitXor, Not};
 
-impl<'a, 'b> BitOr<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+impl<'b> BitOr<&'b ExplicitBitVect> for &ExplicitBitVect {
     type Output = ExplicitBitVect;
     fn bitor(self, rhs: &'b ExplicitBitVect) -> Self::Output {
         self.bit_or(rhs)
     }
 }
 
-impl<'a, 'b> BitAnd<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+impl<'b> BitAnd<&'b ExplicitBitVect> for &ExplicitBitVect {
     type Output = ExplicitBitVect;
     fn bitand(self, rhs: &'b ExplicitBitVect) -> Self::Output {
         self.bit_and(rhs)
     }
 }
 
-impl<'a, 'b> BitXor<&'b ExplicitBitVect> for &'a ExplicitBitVect {
+impl<'b> BitXor<&'b ExplicitBitVect> for &ExplicitBitVect {
     type Output = ExplicitBitVect;
     fn bitxor(self, rhs: &'b ExplicitBitVect) -> Self::Output {
         self.bit_xor(rhs)
     }
 }
 
-impl<'a> Not for &'a ExplicitBitVect {
+impl Not for &ExplicitBitVect {
     type Output = ExplicitBitVect;
     fn not(self) -> Self::Output {
         let bits = self.bits.iter().map(|b| !*b).collect();

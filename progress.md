@@ -97,9 +97,10 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto, bitwise ops, fold
  - [x] Port ExplicitBitVect core API (+ unit tests)
  - [x] Translate first Catch2 datastructs tests to Rust (SparseBitVect limit case, base64 round-trip)
+ - [x] Resolve clippy nits in datastructs crate (base64 deprecation, needless lifetimes, len/is_empty, tests bool assert)
  - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
  - [ ] Document workspace `README.md`
 
 ---
 
-Currently working on: **Stage 5 – Translate first Catch2 DataStructs tests to Rust (focus on SparceBitVect limits and fold fingerprint)**
+Currently working on: **Stage 5 – Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)**

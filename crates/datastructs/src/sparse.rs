@@ -6,6 +6,8 @@ use std::collections::HashSet;
 use std::fmt;
 use std::ops::{BitAnd, BitOr, BitXor, Not};
 
+use base64::prelude::*;
+
 /// A sparse bit-vector with a fixed length.
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct SparseBitVect {
@@ -76,11 +78,13 @@ impl SparseBitVect {
     /// Base64 serialization (bincode + base64).
     pub fn to_base64(&self) -> String {
         let bytes = bincode::serialize(self).expect("serialize SparseBitVect");
-        base64::encode(bytes)
+        base64::engine::general_purpose::STANDARD.encode(bytes)
     }
 
     pub fn from_base64(s: &str) -> Self {
-        let bytes = base64::decode(s).expect("decode SparseBitVect");
+        let bytes = base64::engine::general_purpose::STANDARD
+            .decode(s)
+            .expect("decode base64 SparseBitVect");
         bincode::deserialize(&bytes).expect("deserialize SparseBitVect")
     }
 }
@@ -108,7 +112,7 @@ impl Eq for SparseBitVect {}
 // -------------------------------------------------------------------------
 // Bitwise operations.  These mirror the semantics of C++ `operator| & ^ ~`.
 
-impl<'a, 'b> BitOr<&'b SparseBitVect> for &'a SparseBitVect {
+impl<'b> BitOr<&'b SparseBitVect> for &SparseBitVect {
     type Output = SparseBitVect;
     fn bitor(self, rhs: &'b SparseBitVect) -> Self::Output {
         assert_eq!(self.size, rhs.size);
@@ -121,7 +125,7 @@ impl<'a, 'b> BitOr<&'b SparseBitVect> for &'a SparseBitVect {
     }
 }
 
-impl<'a, 'b> BitAnd<&'b SparseBitVect> for &'a SparseBitVect {
+impl<'b> BitAnd<&'b SparseBitVect> for &SparseBitVect {
     type Output = SparseBitVect;
     fn bitand(self, rhs: &'b SparseBitVect) -> Self::Output {
         assert_eq!(self.size, rhs.size);
@@ -137,7 +141,7 @@ impl<'a, 'b> BitAnd<&'b SparseBitVect> for &'a SparseBitVect {
     }
 }
 
-impl<'a, 'b> BitXor<&'b SparseBitVect> for &'a SparseBitVect {
+impl<'b> BitXor<&'b SparseBitVect> for &SparseBitVect {
     type Output = SparseBitVect;
     fn bitxor(self, rhs: &'b SparseBitVect) -> Self::Output {
         assert_eq!(self.size, rhs.size);
@@ -153,7 +157,7 @@ impl<'a, 'b> BitXor<&'b SparseBitVect> for &'a SparseBitVect {
     }
 }
 
-impl<'a> Not for &'a SparseBitVect {
+impl Not for &SparseBitVect {
     type Output = SparseBitVect;
     fn not(self) -> Self::Output {
         let mut bits = HashSet::new();
@@ -184,7 +188,7 @@ mod tests {
         let mut bv = SparseBitVect::new(max);
         assert_eq!(bv.num_bits(), max);
         // set last *inclusive* bit (allowed when size == UINT_MAX)
-        assert_eq!(bv.set_bit(max), false);
+        assert!(!bv.set_bit(max));
         assert!(bv.get_bit(max));
         assert_eq!(bv.num_on_bits(), 1);
     }
