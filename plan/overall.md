@@ -7,11 +7,11 @@ Rust rewrite of the C++ RDKit core (bindings out-of-scope).
 
 ## 1. Workspace layout
 
-`rust-oxide/` will be a Cargo workspace containing multiple crates, roughly
+`./` will be a Cargo workspace containing multiple crates, roughly
 mirroring the existing C++ module boundaries while observing Rust idioms:
 
 ```
-rust-oxide/
+./
   Cargo.toml          # workspace definition
   crates/
     rdkit-core/       # common types, error enums, logging, utilities
@@ -32,6 +32,25 @@ rust-oxide/
 
 Crates will have explicit APIs; only `rdkit-core` will be a public dependency
 for external users.  Everything else is `pub(crate)` unless needed.
+
+In addition to the workspace‐level `tests` crate (for cross-crate integration
+scenarios), *every* library crate will embed its own unit tests next to the
+implementation code using the standard Rust pattern:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn basic_property_holds() {
+        /* … */
+    }
+}
+```
+
+This keeps fine-grained tests close to the code they verify while allowing
+larger black-box tests in the workspace’s `tests/` directory.
 
 -------------------------------------------------------------------------------
 
@@ -95,6 +114,9 @@ for external users.  Everything else is `pub(crate)` unless needed.
 
 * Create one Rust test module per original Catch2 file; use `#[test]` + quick-
   check where meaningful.
+* Keep unit tests inline with the crate source (`mod tests { … }`) so they run
+  with `cargo test -p <crate>`.  Reserved integration tests live under
+  `rust-oxide/tests/`.
 * Re-implement helper asserts like `CHECK_CLOSE` via `approx` crate.
 * Translation order mirrors implementation order so the test suite remains
   green after each milestone.

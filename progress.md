@@ -89,9 +89,16 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 5 – Implementation (pending)
 
-- [ ] Set up and try out Rust workspace in pwd.
-- [ ] Translate core data structures (`BitVect`, etc.).
-- [ ] ... (to be expanded later).
+ - [ ] Bootstrap Cargo workspace `./`
+   - [x] root `Cargo.toml` with workspace members (commit <pending>)
+   - [x] crates/rdkit-core (error types, invariant macro, basic logging shim)
+   - [x] crates/datastructs (BitOps skeleton, ExplicitBitVect stub)
+ - [ ] Configure continuous testing (`cargo test --workspace`) in CI script (future)
+ - [ ] Port BitOps functions (+ unit tests)
+ - [ ] Port ExplicitBitVect core API (+ unit tests)
+ - [ ] Translate first Catch2 datastructs tests to Rust
+ - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)
+ - [ ] Document workspace `README.md`
 
 ---
 
@@ -99,4 +106,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 4 status: in progress 🛠️
 
-Currently working on: **“Stage 5 – Bootstrap Rust workspace and port datastructs core.”**
+Currently working on: **“Stage 5 – Port BitOps functions and unit tests.”**
