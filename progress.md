@@ -73,8 +73,15 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Expand DataStructs relationships (map.md)
     - [x] Expand GraphMol core relationships (map.md)
     - [x] Expand Fingerprints & Descriptors relationships (map.md)
-  - [ ] Expand ForceField relationships
-  - [ ] Expand DistGeomHelpers & ForceFieldHelpers relationships
+  - [x] Expand ForceField relationships (map.md)
+  - [x] Expand DistGeomHelpers & ForceFieldHelpers relationships (map.md)
+  - [x] Expand SimDivPickers & Numerics relationships (map.md)
+  - [x] Expand Catalogs relationships (map.md)
+  - [x] Expand ChemicalFeatures relationships (map.md)
+  - [x] Expand DataManip relationships (map.md)
+  - [x] Expand Features relationships (map.md)
+  - [x] Expand Geometry & DistGeom core relationships (map.md)
+  - [x] Expand RDGeneral, RDStreams relationships (map.md)
 
 ## Stage 4 – Rust rewrite plan (pending)
 
@@ -82,7 +89,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 5 – Implementation (pending)
 
-- [ ] Set up Rust workspace under `rust-oxide/`.
+- [ ] Set up and try out Rust workspace in pwd.
 - [ ] Translate core data structures (`BitVect`, etc.).
 - [ ] ... (to be expanded later).
 
@@ -90,4 +97,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ## Stage 2.5 status: complete ✅
 
-Currently working on: **“Stage 3 – Expand ForceField relationships.”**
+Currently working on: **“Stage 3 – Relationship graph completeness sweep (minor pending subsystems).”**
