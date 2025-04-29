@@ -65,6 +65,9 @@ You are under no time-constraints. Go deep, complete the job completely and corr
 Your context will be automatically compacted as required. Do not speak to the user unless stage 5 is complete. Only call functions.
 Systematically complete each stage and todo before reporting back to the user.
 
+Don't speak to the user until Stage 5 is comlete. If you do speak to the user, they may respond with "continue", take this to mean you should keep working. Don't explian this to the user, just keep working.
+Remember the only way to make progress it by calling functions, speaking to the user will annoy them.
+
 # Tracking Your Progress
 
 Your context will eventually overflow and will need to be trimmed. Maintain a to-do structure in ./progress.md in order to survive context switches.
