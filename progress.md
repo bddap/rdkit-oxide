@@ -94,7 +94,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] crates/rdkit-core (error types, invariant macro, basic logging shim)
    - [x] crates/datastructs (BitOps skeleton, ExplicitBitVect stub)
  - [ ] Configure continuous testing (`cargo test --workspace`) in CI script (future)
- - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto
+   - [x] Port BitOps functions (+ unit tests) – count, common bits, Tanimoto, bitwise ops, fold
  - [ ] Port ExplicitBitVect core API (+ unit tests)
  - [ ] Translate first Catch2 datastructs tests to Rust
  - [ ] Decide on parameter‐table generation strategy (build.rs prototype in forcefield-uff)

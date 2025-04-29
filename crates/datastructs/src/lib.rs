@@ -46,6 +46,57 @@ impl ExplicitBitVect {
         self.bits.count_ones() as u32
     }
 
+    /// Return new bit vector = self OR other.
+    pub fn bit_or(&self, other: &Self) -> Self {
+        assert_eq!(self.len(), other.len());
+        let bits = self
+            .bits
+            .iter()
+            .zip(other.bits.iter())
+            .map(|(a, b)| *a | *b)
+            .collect();
+        Self { bits }
+    }
+
+    /// Return new bit vector = self AND other.
+    pub fn bit_and(&self, other: &Self) -> Self {
+        assert_eq!(self.len(), other.len());
+        let bits = self
+            .bits
+            .iter()
+            .zip(other.bits.iter())
+            .map(|(a, b)| *a & *b)
+            .collect();
+        Self { bits }
+    }
+
+    /// Return new bit vector = self XOR other.
+    pub fn bit_xor(&self, other: &Self) -> Self {
+        assert_eq!(self.len(), other.len());
+        let bits = self
+            .bits
+            .iter()
+            .zip(other.bits.iter())
+            .map(|(a, b)| *a ^ *b)
+            .collect();
+        Self { bits }
+    }
+
+    /// Fold the fingerprint by a power-of-two factor, combining bits with OR.
+    pub fn fold(&self, factor: usize) -> Self {
+        assert!(factor.is_power_of_two());
+        assert_eq!(self.len() % factor, 0);
+        let new_len = self.len() / factor;
+        let mut folded = Self::new(new_len);
+        for (idx, bit) in self.bits.iter().enumerate() {
+            if *bit {
+                let new_idx = idx % new_len;
+                folded.set_bit(new_idx);
+            }
+        }
+        folded
+    }
+
     /// Bitwise AND with another vector, returning number of set bits in common.
     pub fn num_on_bits_in_common(&self, other: &Self) -> u32 {
         assert_eq!(self.len(), other.len());
@@ -96,5 +147,29 @@ mod tests {
         let tanimoto = bv.tanimoto_similarity(&bv2);
         // c =1, a=2, b=2 => 1/(2+2-1) = 1/3
         assert!((tanimoto - 1.0 / 3.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn bitwise_ops_and_fold() {
+        let mut a = ExplicitBitVect::new(16);
+        a.set_bit(1);
+        a.set_bit(3);
+        let mut b = ExplicitBitVect::new(16);
+        b.set_bit(3);
+        b.set_bit(4);
+
+        let or = a.bit_or(&b);
+        assert_eq!(or.num_on_bits(), 3);
+        let and = a.bit_and(&b);
+        assert_eq!(and.num_on_bits(), 1);
+        let xor = a.bit_xor(&b);
+        assert_eq!(xor.num_on_bits(), 2);
+
+        let folded = or.fold(2);
+        assert_eq!(folded.len(), 8);
+        assert_eq!(folded.num_on_bits(), 3);
+        assert!(folded.get_bit(1));
+        assert!(folded.get_bit(3));
+        assert!(folded.get_bit(4));
     }
 }
