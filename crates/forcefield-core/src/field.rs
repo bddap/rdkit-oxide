@@ -201,8 +201,8 @@ impl ForceField {
             let j = &self.atoms[angle.j.0];
             let k = &self.atoms[angle.k.0];
 
-            let vij = (i.coord - j.coord);
-            let vkj = (k.coord - j.coord);
+            let vij = i.coord - j.coord;
+            let vkj = k.coord - j.coord;
             let cos_theta = dot(vij, vkj) / (norm(vij) * norm(vkj));
             let theta = clip_to_one(cos_theta).acos();
 
