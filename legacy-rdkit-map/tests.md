@@ -149,6 +149,15 @@ Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 ------------------------------------------------------------------------------
 
+## GraphMol – DistGeomHelpers
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/DistGeomHelpers/catch_tests.cpp` | Tests macrocycle torsion preferences integration (`CrystalFF`), JSON updates to `EmbedParameters`, timeout handling, and conformer RMS checks vs reference. |
+| `GraphMol/DistGeomHelpers/testDgeomHelpers.cpp` | Legacy tests for bounds‐matrix builder, ETKDG embedding success rates, RMS pruning, basin threshold behaviour. |
+
+------------------------------------------------------------------------------
+
 ------------------------------------------------------------------------------
 
 Pending sections: DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.

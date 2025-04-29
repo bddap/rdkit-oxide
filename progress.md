@@ -59,7 +59,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Descriptors (tests.md)
     - [x] Reactions (tests.md)
     - [x] FMCS (tests.md)
-    - [ ] DistGeomHelpers
+    - [x] DistGeomHelpers (tests.md)
     - [ ] ForceFieldHelpers
     - [ ] RGroupDecomposition
   - [ ] SimDivPickers tests
@@ -82,4 +82,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2.5 – DistGeomHelpers tests catalogue.”**
+Currently working on: **“Stage 2.5 – ForceFieldHelpers tests catalogue.”**
