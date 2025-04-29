@@ -55,9 +55,9 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] Core basics (tests.md)
     - [x] Chirality & Stereo (tests.md)
     - [x] FileParsers (tests.md)
-    - [ ] Fingerprints
-    - [ ] Descriptors
-    - [ ] Reactions
+    - [x] Fingerprints (tests.md)
+    - [x] Descriptors (tests.md)
+    - [x] Reactions (tests.md)
     - [ ] FMCS
     - [ ] DistGeomHelpers
     - [ ] ForceFieldHelpers

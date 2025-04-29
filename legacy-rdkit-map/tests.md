@@ -100,5 +100,47 @@ Pending sections: GraphMol, SimDivPickers, Numerics, Misc.
 
 ------------------------------------------------------------------------------
 
+## GraphMol – Fingerprints
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `GraphMol/Fingerprints/catch_tests.cpp` | AtomPair and Torsion fingerprint sanity checks. |
+| `GraphMol/Fingerprints/fpgen_catch_tests.cpp` | Catch2 suite for new `FingerprintGenerator` API: AtomPair, Torsion, RDKitFP, Morgan. |
+| `GraphMol/Fingerprints/testFingerprintGenerators.cpp` | Legacy generator API functionality and bitId reproducibility. |
+| `GraphMol/Fingerprints/testMHFPFingerprint.cpp` | MHFP6 MinHash fingerprint accuracy vs reference vectors. |
+| `GraphMol/Fingerprints/test1.cpp` | Early smoke tests for legacy fingerprint helpers. |
+
+------------------------------------------------------------------------------
+
+## GraphMol – Descriptors
+
+| File | Descriptor family | Purpose |
+|------|-------------------|---------|
+| `Descriptors/test.cpp` | Basic scalar descriptors (TPSA, MolLogP) | Compare against reference values. |
+| `Descriptors/testBCUT.cpp` | BCUT eigenvalues | check invariance to atom order. |
+| `Descriptors/testRDF.cpp`, `Descriptors/testRDFcustom.cpp` | Radial distribution function descriptors | default vs custom parameters. |
+| `Descriptors/testAUTOCORR2D.cpp` | 2D autocorrelation | ensure correct summations. |
+| `Descriptors/testAUTOCORR3D.cpp` | 3D autocorrelation | conformer‐dependent descriptor. |
+| `Descriptors/testCoulombMat.cpp` | Coulomb matrix eigenvalues | sorted vs raw comparison. |
+| `Descriptors/test3D.cpp`, `testMORSE.cpp`, `testWHIM.cpp`, `testGETAWAY.cpp` | 3D descriptor families (MORSE, WHIM, GETAWAY). |
+| `Descriptors/testEEM.cpp` | Electronegativity equalisation method charges. |
+| `Descriptors/testPBF.cpp` | Plane-of-best-fit shape descriptor. |
+| `Descriptors/catch_tests.cpp` | Regression for NaNs, conformer exceptions, etc. |
+
+------------------------------------------------------------------------------
+
+## GraphMol – ChemReactions
+
+| File | Highlights | Purpose |
+|------|------------|---------|
+| `ChemReactions/catch_tests.cpp` | Reaction parsing/serialization, SMARTS validation, edge cases. |
+| `ChemReactions/testReaction.cpp` | Applies example reactions and checks products and atom mapping. |
+| `ChemReactions/testReactionFingerprints.cpp` | Reaction fingerprint generation and difference fingerprints repeatability. |
+| `ChemReactions/Enumerate/testEnumerate.cpp` | Enumeration of reagent combinations within size bounds. |
+
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+
 Pending sections: GraphMol Fingerprints, Descriptors, Reactions, FMCS, DistGeomHelpers, ForceFieldHelpers, RGroupDecomposition, SimDivPickers, Numerics, Misc.
 
