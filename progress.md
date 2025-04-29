@@ -156,6 +156,11 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Single `Mol` struct (vec-based) placeholder (crates/rdkit-core/mol.rs). Switch to `petgraph` later if needed.
   - [ ] Implement `MolEditor` session wrapper with dirty flag & explicit commit.
   - [ ] Basic sanitisation & valence model.
+    - [x] Simple covalent valence check in `MolBuilder::finish()` (commit e532a2f).
+    - [ ] Add automatic hydrogen count inference for common elements.
+    - [ ] Ring perception (SSSR) and aromaticity flags.
+    - [ ] Stereochemistry initialisation (chirality markers).
+    - [ ] Advanced valence rules (hypervalent S, P, formal charge handling).
   - [ ] SMILES parser producing `Mol`.
 
 - [ ] Dependency evaluation / ecosystem
@@ -177,4 +182,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Implement Mol sanitisation (valence check) in MolBuilder::finish()**
+Currently working on: **Stage 5 – Add hydrogen count inference to MolBuilder sanitisation**
