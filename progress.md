@@ -32,7 +32,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - [x] DistGeomHelpers (legacy-rdkit-map/GraphMol_DistGeomHelpers.md)
     - [x] ForceFieldHelpers (legacy-rdkit-map/GraphMol_ForceFieldHelpers.md)
   - [-] JavaWrappers (skip – no Rust port)
-  - [ ] ML
+  - [-] ML (skip – utility machine-learning helpers, not needed for Rust port)
   - [-] MinimalLib (skip – wasm viewer only)
   - [ ] Numerics
   - [-] PgSQL (skip – no Rust port)
@@ -64,4 +64,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **“Stage 2 – Detailed map for `GraphMol` ML.”**
+Currently working on: **“Stage 2 – Detailed map for Numerics.”**
