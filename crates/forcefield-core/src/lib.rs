@@ -96,6 +96,33 @@ pub fn bond_stretch_energy(label_i: &str, label_j: &str, bond_order: f64, distan
     Ok(0.5 * k_b * (distance - r0).powi(2))
 }
 
+/// Derivative of the harmonic bond-stretch energy with respect to the bond
+/// distance *r* (∂E/∂r).
+///
+/// Using the harmonic form:
+///
+/// ```text
+/// E = ½ k_b (r - r₀)²
+/// ```
+///
+/// the analytic derivative is
+///
+/// ```text
+/// ∂E/∂r = k_b (r - r₀)
+/// ```
+///
+/// Returned value is in **kcal mol⁻¹ Å⁻¹**.
+pub fn bond_stretch_energy_derivative(
+    label_i: &str,
+    label_j: &str,
+    bond_order: f64,
+    distance: f64,
+) -> Result<f64> {
+    let r0 = bond_rest_length(label_i, label_j, bond_order)?;
+    let k_b = bond_force_constant(label_i, label_j, r0)?;
+    Ok(k_b * (distance - r0))
+}
+
 // ---------------------------------------------------------------------------
 // Public API – angle bend
 // ---------------------------------------------------------------------------
@@ -178,6 +205,50 @@ pub fn angle_bend_energy(
     let angle_term = c0 + c1 * cos_theta + c2 * cos_2theta;
 
     Ok(k_a * angle_term)
+}
+
+/// Derivative of the angle-bend energy with respect to the angle *θ*
+/// (∂E/∂θ, radians⁻¹).
+///
+/// Given the energy expression implemented in [`angle_bend_energy`]:
+///
+/// ```text
+/// E(θ) = k_a ( C₀ + C₁ cosθ + C₂ cos 2θ )
+/// ```
+///
+/// its analytic derivative w.r.t. the angle is
+///
+/// ```text
+/// ∂E/∂θ = k_a ( -C₁ sinθ - 2 C₂ sin 2θ )
+/// ```
+///
+/// where `sin 2θ = 2 sinθ cosθ`.
+pub fn angle_bend_energy_derivative(
+    label_i: &str,
+    label_j: &str,
+    label_k: &str,
+    theta: f64,
+    bond_order_ij: f64,
+    bond_order_jk: f64,
+) -> Result<f64> {
+    let theta0 = atom_params(label_j)?.theta0;
+
+    // Force constant k_a (same helper as energy function)
+    let k_a = angle_force_constant(label_i, label_j, label_k, theta0, bond_order_ij, bond_order_jk)?;
+
+    // Coefficients C₀, C₁, C₂ (duplicate calculation kept in sync with energy version)
+    let sin_theta0 = theta0.sin();
+    let cos_theta0 = theta0.cos();
+    let c2 = 1.0 / (4.0 * (sin_theta0 * sin_theta0).max(1e-8));
+    let c1 = -4.0 * c2 * cos_theta0;
+    // c0 not needed for derivative
+
+    let cos_theta = clip_to_one(theta.cos());
+    let sin_theta = clip_to_one(theta.sin());
+    // sin 2θ = 2 sinθ cosθ
+    let sin_2theta = 2.0 * sin_theta * cos_theta;
+
+    Ok(k_a * (-c1 * sin_theta - 2.0 * c2 * sin_2theta))
 }
 
 // ---------------------------------------------------------------------------
@@ -288,6 +359,77 @@ mod tests {
         // Distort to 120°, energy must increase
         let e_distort = angle_bend_energy("H_", "O_3", "H_", 120.0_f64.to_radians(), 1.0, 1.0).unwrap();
         assert!(e_distort > 0.1);
+    }
+
+    #[test]
+    fn bond_derivative_matches_fd() {
+        // Compare analytic derivative to finite-difference for C–O single bond
+        let label_i = "C_3";
+        let label_j = "O_3";
+        let order = 1.0;
+
+        let r0 = bond_rest_length(label_i, label_j, order).unwrap();
+        let r = r0 + 0.02; // small stretch
+
+        // Analytic derivative
+        let d_ana = bond_stretch_energy_derivative(label_i, label_j, order, r).unwrap();
+
+        // Finite difference derivative (central) with small dr
+        let h = 1.0e-5;
+        let e_plus = bond_stretch_energy(label_i, label_j, order, r + h).unwrap();
+        let e_minus = bond_stretch_energy(label_i, label_j, order, r - h).unwrap();
+        let d_fd = (e_plus - e_minus) / (2.0 * h);
+
+        approx::assert_relative_eq!(d_ana, d_fd, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn angle_derivative_matches_fd() {
+        // Water H–O–H angle derivative test
+        let label_i = "H_";
+        let label_j = "O_3";
+        let label_k = "H_";
+        let order_ij = 1.0;
+        let order_jk = 1.0;
+
+        let theta0 = atom_params(label_j).unwrap().theta0;
+        let theta = theta0 + 5_f64.to_radians();
+
+        // Analytic derivative
+        let d_ana = angle_bend_energy_derivative(
+            label_i,
+            label_j,
+            label_k,
+            theta,
+            order_ij,
+            order_jk,
+        )
+        .unwrap();
+
+        // Finite-difference
+        let h = 1e-5;
+        let e_plus = angle_bend_energy(
+            label_i,
+            label_j,
+            label_k,
+            theta + h,
+            order_ij,
+            order_jk,
+        )
+        .unwrap();
+        let e_minus = angle_bend_energy(
+            label_i,
+            label_j,
+            label_k,
+            theta - h,
+            order_ij,
+            order_jk,
+        )
+        .unwrap();
+
+        let d_fd = (e_plus - e_minus) / (2.0 * h);
+
+        approx::assert_relative_eq!(d_ana, d_fd, epsilon = 1e-4);
     }
 
     #[test]

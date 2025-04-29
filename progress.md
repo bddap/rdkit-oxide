@@ -159,4 +159,11 @@ This file is updated incrementally to survive context compression.  Each top-lev
    - [x] Added central finite-difference gradient, simple backtracking line search, RMS-gradient convergence.
    - [x] Unit test on distorted water molecule.
 
-Currently working on: **Stage 5 – Preparation for analytic gradients – design gradient expressions for bond, angle**
+## Recent updates
+
+- Added analytic derivatives for bond‐stretch and angle‐bend energy terms in `crates/forcefield-core/src/lib.rs` (`bond_stretch_energy_derivative`, `angle_bend_energy_derivative`).
+- Added unit tests verifying agreement with finite‐difference derivatives.
+
+---
+
+Currently working on: **Stage 5 – Implement analytic per-atom gradient for bond-stretch terms**
