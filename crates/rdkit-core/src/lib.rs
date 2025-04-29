@@ -20,6 +20,7 @@ pub type Result<T, E = RdError> = std::result::Result<T, E>;
 // ---------------------------------------------------------------------------
 
 pub mod mol;
+pub mod mol_builder;
 
 /// Runtime invariant check (similar to RDKit's `PRECONDITION`).
 #[macro_export]
