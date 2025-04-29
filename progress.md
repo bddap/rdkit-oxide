@@ -125,8 +125,8 @@ This file is updated incrementally to survive context compression.  Each top-lev
     - Path: `crates/datastructs/src/fpb.rs`, tests in same module.
 
 - [ ] Geometry crate (to create)
-  - [ ] Point3D and Vector3D types + basic linear algebra traits.
-  - [ ] Transformation matrices / quaternion helpers.
+  - [x] Point3D and Vector3D types + basic linear algebra traits (crates/geometry).
+  - [x] Transformation matrices / quaternion helpers (crates/geometry).
 
 - [ ] forcefield-core expansion
   - [ ] Torsion (dihedral) term energy + gradient.
@@ -155,4 +155,4 @@ This file is updated incrementally to survive context compression.  Each top-lev
 
 ---
 
-Currently working on: **Stage 5 – Geometry crate – transformation matrices & quaternion helpers**
+Currently working on: **Stage 5 – forcefield-core: implement torsion (dihedral) term energy + gradient**

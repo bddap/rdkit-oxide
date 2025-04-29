@@ -8,6 +8,143 @@ use nalgebra as na;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point3D(pub f64, pub f64, pub f64);
 
+/// A 3-D vector (direction + magnitude).  Thin newtype around `nalgebra::Vector3`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Vector3D(pub na::Vector3<f64>);
+
+impl Vector3D {
+    /// Construct from raw components.
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self(na::Vector3::new(x, y, z))
+    }
+
+    pub fn x(&self) -> f64 {
+        self.0.x
+    }
+    pub fn y(&self) -> f64 {
+        self.0.y
+    }
+    pub fn z(&self) -> f64 {
+        self.0.z
+    }
+
+    /// Dot product.
+    pub fn dot(self, other: Self) -> f64 {
+        self.0.dot(&other.0)
+    }
+
+    /// Cross product.
+    pub fn cross(self, other: Self) -> Self {
+        Self(self.0.cross(&other.0))
+    }
+
+    /// Euclidean norm (length).
+    pub fn norm(self) -> f64 {
+        self.0.norm()
+    }
+
+    /// Return a normalised vector (unit length).  Returns `None` for zero vector.
+    pub fn normalized(self) -> Option<Self> {
+        let n = self.norm();
+        if n.abs() < f64::EPSILON {
+            None
+        } else {
+            Some(Self(self.0 / n))
+        }
+    }
+}
+
+// --- Operators -------------------------------------------------------------
+
+use std::ops::{Add, Sub, Mul, Neg};
+
+impl Add for Vector3D {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+
+impl Sub for Vector3D {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
+    }
+}
+
+impl Mul<f64> for Vector3D {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self(self.0 * rhs)
+    }
+}
+
+impl Neg for Vector3D {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        Self(-self.0)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Quaternion & rotations -----------------------------------------------------
+
+pub type Quaternion = na::UnitQuaternion<f64>;
+
+/// Rotation utilities.
+pub mod rotation {
+    use super::{Quaternion, Vector3D, na};
+
+    /// Construct a quaternion representing rotation of `angle_rad` around given axis.
+    pub fn axis_angle(axis: Vector3D, angle_rad: f64) -> Quaternion {
+        Quaternion::from_axis_angle(&na::Unit::new_normalize(axis.0), angle_rad)
+    }
+
+    /// Rotate a vector by a quaternion.
+    pub fn rotate_vec(q: &Quaternion, v: Vector3D) -> Vector3D {
+        Vector3D(q.transform_vector(&v.0))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Affine transform (4×4 matrix) ---------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Transform3D(pub na::Matrix4<f64>);
+
+impl Transform3D {
+    /// Identity transform.
+    pub fn identity() -> Self {
+        Self(na::Matrix4::identity())
+    }
+
+    /// Translation by vector.
+    pub fn from_translation(v: Vector3D) -> Self {
+        let mut m = na::Matrix4::identity();
+        m[(0, 3)] = v.x();
+        m[(1, 3)] = v.y();
+        m[(2, 3)] = v.z();
+        Self(m)
+    }
+
+    /// Rotation from a quaternion (no translation).
+    pub fn from_quaternion(q: Quaternion) -> Self {
+        Self(q.to_homogeneous())
+    }
+
+    /// Combine two transforms (self · other).
+    pub fn then(self, other: Self) -> Self {
+        Self(self.0 * other.0)
+    }
+
+    /// Apply transform to a point.
+    pub fn apply_point(self, p: Point3D) -> Point3D {
+        let v = na::Vector4::new(p.0, p.1, p.2, 1.0);
+        let res = self.0 * v;
+        Point3D(res.x, res.y, res.z)
+    }
+}
+
 impl Point3D {
     /// Euclidean distance to another point.
     pub fn distance(self, other: Self) -> f64 {
@@ -23,7 +160,7 @@ impl Point3D {
     }
 }
 
-use std::ops::{Add, Sub};
+
 
 impl Add for Point3D {
     type Output = Point3D;
@@ -48,6 +185,9 @@ pub fn dot(a: Point3D, b: Point3D) -> f64 {
 pub fn norm(v: Point3D) -> f64 {
     (v.0 * v.0 + v.1 * v.1 + v.2 * v.2).sqrt()
 }
+
+// ---------------------------------------------------------------------------
+// Extended tests ------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
@@ -78,5 +218,38 @@ mod tests {
         assert_relative_eq!(norm(v), 5.0);
         let u = Point3D(1.0, 0.0, 0.0);
         assert_eq!(dot(v, u), 3.0);
+    }
+
+    #[test]
+    fn vector3d_ops() {
+        let a = Vector3D::new(1.0, 0.0, 0.0);
+        let b = Vector3D::new(0.0, 1.0, 0.0);
+        let c = a + b;
+        assert_relative_eq!(c.norm(), (2.0f64).sqrt());
+        let cross = a.cross(b);
+        assert_eq!(cross, Vector3D::new(0.0, 0.0, 1.0));
+        let dot = a.dot(b);
+        assert_eq!(dot, 0.0);
+    }
+
+    #[test]
+    fn quaternion_rotation() {
+        // 90° around Z axis should rotate (1,0,0) -> (0,1,0)
+        let axis = Vector3D::new(0.0, 0.0, 1.0);
+        let q = rotation::axis_angle(axis, std::f64::consts::FRAC_PI_2);
+        let v = Vector3D::new(1.0, 0.0, 0.0);
+        let rotated = rotation::rotate_vec(&q, v);
+        assert_relative_eq!(rotated.x(), 0.0, epsilon = 1e-12);
+        assert_relative_eq!(rotated.y(), 1.0, epsilon = 1e-12);
+        assert_relative_eq!(rotated.z(), 0.0, epsilon = 1e-12);
+    }
+
+    #[test]
+    fn transform_apply() {
+        let translation = Vector3D::new(1.0, 2.0, 3.0);
+        let t = Transform3D::from_translation(translation);
+        let p = Point3D(0.0, 0.0, 0.0);
+        let res = t.apply_point(p);
+        assert_eq!(res, Point3D(1.0, 2.0, 3.0));
     }
 }
