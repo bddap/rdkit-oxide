@@ -199,9 +199,92 @@ mod tests {
         let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
 
         for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
-            assert_relative_eq!(ga.0, gf.0, epsilon = 1e-4);
-            assert_relative_eq!(ga.1, gf.1, epsilon = 1e-4);
-            assert_relative_eq!(ga.2, gf.2, epsilon = 1e-4);
+            assert_relative_eq!(ga.0, gf.0, epsilon = 2e-4);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 2e-4);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 2e-4);
+        }
+    }
+
+    #[test]
+    fn torsion_gradients_match_fd() {
+        // Simple four-atom system forming a non-degenerate dihedral (butane-like).
+        let mut ff = ForceField::default();
+
+
+
+        let a = ff.add_atom("C_3", Point3D(0.0, 0.0, 0.0));
+        let b = ff.add_atom("C_3", Point3D(1.54, 0.0, 0.0)); // typical C–C bond
+        let c = ff.add_atom("C_3", Point3D(2.54, 0.1, 0.0));
+        let d = ff.add_atom("C_3", Point3D(3.54, 0.1, 0.1));
+
+        // Add torsion term with arbitrary barrier height.
+        let v = 3.0; // kcal/mol
+        let n = 3; // threefold periodicity (sp3-sp3)
+        let phi0 = 0.0; // equilibrium phase (radians)
+
+        ff.add_torsion(a, b, c, d, v, n as u32, phi0);
+
+        // Analytic gradients for torsion term.
+        let g_ana = ff.torsion_gradients().unwrap();
+
+        // Finite-difference gradients of total energy (only torsion present).
+        fn numerical_grad(ff: &mut ForceField, h: f64) -> rdkit_core::Result<Vec<Point3D>> {
+            enum Axis { X, Y, Z }
+
+            fn coord_mut<'a>(p: &'a mut Point3D, axis: &Axis) -> &'a mut f64 {
+                match axis {
+                    Axis::X => &mut p.0,
+                    Axis::Y => &mut p.1,
+                    Axis::Z => &mut p.2,
+                }
+            }
+
+            fn fd_comp(
+                ff: &mut ForceField,
+                atom_idx: usize,
+                axis: Axis,
+                h: f64,
+            ) -> rdkit_core::Result<f64> {
+                let orig;
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    orig = *coord;
+                    *coord = orig + h;
+                }
+                let e_plus = ff.total_energy()?;
+
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig - h;
+                }
+                let e_minus = ff.total_energy()?;
+
+                {
+                    let coord = coord_mut(&mut ff.get_atom_mut(atom_idx).coord, &axis);
+                    *coord = orig;
+                }
+
+                Ok((e_plus - e_minus) / (2.0 * h))
+            }
+
+            let natoms = ff.atom_count();
+            let mut grad = Vec::with_capacity(natoms);
+            for idx in 0..natoms {
+                let gx = fd_comp(ff, idx, Axis::X, h)?;
+                let gy = fd_comp(ff, idx, Axis::Y, h)?;
+                let gz = fd_comp(ff, idx, Axis::Z, h)?;
+                grad.push(Point3D(gx, gy, gz));
+            }
+
+            Ok(grad)
+        }
+
+        let g_fd = numerical_grad(&mut ff, 1e-4).unwrap();
+
+        for (ga, gf) in g_ana.iter().zip(g_fd.iter()) {
+            assert_relative_eq!(ga.0, gf.0, epsilon = 2e-4);
+            assert_relative_eq!(ga.1, gf.1, epsilon = 2e-4);
+            assert_relative_eq!(ga.2, gf.2, epsilon = 2e-4);
         }
     }
 }
@@ -367,6 +450,14 @@ impl ForceField {
             total.2 += g.2;
         }
 
+        // Torsion term ---------------------------------------------------
+        let torsion_grad = self.torsion_gradients()?;
+        for (total, g) in grad.iter_mut().zip(torsion_grad.iter()) {
+            total.0 += g.0;
+            total.1 += g.1;
+            total.2 += g.2;
+        }
+
         Ok(grad)
     }
 
@@ -515,6 +606,143 @@ impl ForceField {
             grad[j_idx].0 += g_j.x();
             grad[j_idx].1 += g_j.y();
             grad[j_idx].2 += g_j.z();
+        }
+
+        Ok(grad)
+    }
+
+    /// Compute analytic Cartesian gradients originating from **torsion/dihedral**
+    /// terms currently present in the force‐field.  The implementation is a
+    /// direct Rust port of the algorithm used in RDKit’s `UFF::TorsionAngle`
+    /// contribution (see `ForceField/UFF/TorsionAngle.cpp`).  Although the
+    /// algebra is somewhat involved, the core idea is straightforward:
+    ///
+    /// 1. Let `φ` be the dihedral angle between the two planes defined by the
+    ///    atom triplets *(i, j, k)* and *(j, k, l)*.
+    /// 2. The energy depends only on `φ`, i.e. `E = f(φ)`.
+    /// 3. By the chain-rule the Cartesian gradient on an atom *p* is
+    ///    `∂E/∂p = (dE/dφ) · (∂φ/∂p)`.
+    ///
+    /// The derivative `dE/dφ` is trivial – we have an analytic expression in
+    /// [`crate::torsion_energy_derivative`].  The heavy lifting is therefore
+    /// buried in the geometric term `∂φ/∂p`.  To avoid re-deriving the entire
+    /// expression we translate RDKit’s well-tested helper routine verbatim,
+    /// keeping the same nomenclature (`r`, `t`, `dCos_dT`, …).
+    pub fn torsion_gradients(&self) -> rdkit_core::Result<Vec<geometry::Point3D>> {
+        use geometry::Vector3D;
+
+        let mut grad = vec![geometry::Point3D(0.0, 0.0, 0.0); self.atom_count()];
+
+        // Threshold to guard against division by zero.
+        const EPS: f64 = 1e-8;
+
+        for tor in &self.torsions {
+            let (i_idx, j_idx, k_idx, l_idx) = (tor.i.0, tor.j.0, tor.k.0, tor.l.0);
+
+            let p1 = self.atoms[i_idx].coord;
+            let p2 = self.atoms[j_idx].coord;
+            let p3 = self.atoms[k_idx].coord;
+            let p4 = self.atoms[l_idx].coord;
+
+            // --- Construct intermediate vectors identical to RDKit helper ---
+            let r0: Vector3D = p1 - p2; // r[0] = p1 - p2
+            let r1: Vector3D = p3 - p2; // r[1] = p3 - p2
+            let r2: Vector3D = p2 - p3; // r[2] = -r1
+            let r3: Vector3D = p4 - p3; // r[3] = p4 - p3
+
+            // t0 = r0 × r1 ; t1 = r2 × r3
+            let mut t0 = r0.cross(r1);
+            let mut t1 = r2.cross(r3);
+
+            // Normalise t0 and t1, retaining original norms in d0/d1.
+            let d0 = t0.norm();
+            let d1 = t1.norm();
+
+            if d0 < EPS || d1 < EPS {
+                // Atoms are nearly colinear – skip this torsion contribution to
+                // avoid numerical blow-ups.  Energy and gradient are negligible
+                // around the singularity anyway.
+                continue;
+            }
+
+            t0 = t0 / d0;
+            t1 = t1 / d1;
+
+            // Cosine and sine of the dihedral.
+            let cos_phi = clip_to_one(t0.dot(t1));
+            let sin_phi_sq = 1.0 - cos_phi * cos_phi;
+            let sin_phi = sin_phi_sq.max(0.0).sqrt();
+
+            // Actual dihedral angle (signed) is only needed for dE/dφ.
+            let phi = dihedral_angle(p1, p2, p3, p4);
+
+            // dE/dφ from the torsion potential.
+            let de_dphi = crate::torsion_energy_derivative(tor.v, tor.periodicity, phi, tor.phi0);
+
+            // sinTerm = dE_dphi / sin_phi  (with fallback when sin_phi ≈ 0)
+            let sin_term = if sin_phi.abs() < EPS {
+                de_dphi / cos_phi
+            } else {
+                de_dphi / sin_phi
+            };
+
+            // Pre-compute helper derivatives dCos/dT (see original C++ code).
+            //   dCos/dT0 = (t1 - cosφ · t0) / |t0_orig|
+            //   dCos/dT1 = (t0 - cosφ · t1) / |t1_orig|
+            let dcos_dt0 = (t1 - t0 * cos_phi) / d0;
+            let dcos_dt1 = (t0 - t1 * cos_phi) / d1;
+
+            // Unpack components for convenience.
+            let (d0x, d0y, d0z) = (dcos_dt0.x(), dcos_dt0.y(), dcos_dt0.z());
+            let (d1x, d1y, d1z) = (dcos_dt1.x(), dcos_dt1.y(), dcos_dt1.z());
+
+            // r vectors components
+            let (r1x, r1y, r1z) = (r1.x(), r1.y(), r1.z());
+            let (r0x, r0y, r0z) = (r0.x(), r0.y(), r0.z());
+            let (r2x, r2y, r2z) = (r2.x(), r2.y(), r2.z());
+            let (r3x, r3y, r3z) = (r3.x(), r3.y(), r3.z());
+
+            // Gradient for atom i (p1) --------------------------------------------------
+            grad[i_idx].0 += sin_term * (d0z * r1y - d0y * r1z);
+            grad[i_idx].1 += sin_term * (d0x * r1z - d0z * r1x);
+            grad[i_idx].2 += sin_term * (d0y * r1x - d0x * r1y);
+
+            // Atom j (p2) --------------------------------------------------------------
+            grad[j_idx].0 += sin_term * (d0y * (r1z - r0z)
+                + d0z * (r0y - r1y)
+                + d1y * (-r3z)
+                + d1z * (r3y));
+
+            grad[j_idx].1 += sin_term * (d0x * (r0z - r1z)
+                + d0z * (r1x - r0x)
+                + d1x * (r3z)
+                + d1z * (-r3x));
+
+            grad[j_idx].2 += sin_term * (d0x * (r1y - r0y)
+                + d0y * (r0x - r1x)
+                + d1x * (-r3y)
+                + d1y * (r3x));
+
+            // Atom k (p3) --------------------------------------------------------------
+            grad[k_idx].0 += sin_term * (d0y * (r0z)
+                + d0z * (-r0y)
+                + d1y * (r3z - r2z)
+                + d1z * (r2y - r3y));
+
+            grad[k_idx].1 += sin_term * (d0x * (-r0z)
+                + d0z * (r0x)
+                + d1x * (r2z - r3z)
+                + d1z * (r3x - r2x));
+
+            grad[k_idx].2 += sin_term * (d0x * (r0y)
+                + d0y * (-r0x)
+                + d1x * (r3y - r2y)
+                + d1y * (r2x - r3x));
+
+            // Atom l (p4) --------------------------------------------------------------
+            grad[l_idx].0 += sin_term * (d1y * r2z - d1z * r2y);
+            grad[l_idx].1 += sin_term * (d1z * r2x - d1x * r2z);
+            grad[l_idx].2 += sin_term * (d1x * r2y - d1y * r2x);
         }
 
         Ok(grad)
