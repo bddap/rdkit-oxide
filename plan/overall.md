@@ -91,9 +91,16 @@ larger black-box tests in the workspace’s `tests/` directory.
      C++ achieved via the `ROMol`/`RWMol` class split.  
    • Internally, the molecular graph is stored in a `petgraph::Graph` with
      atom/node indices kept stable.  
-   • Convenience *editing session* wrapper `MolEditor<'_>` will be introduced
-     (new-type holding `&mut Mol`) to replicate C++’s batch-edit pattern and
-     handle automatic sanitisation on drop.  
+   • *Editing session* wrapper `MolEditor<'_>` (new-type around `&mut Mol`) is
+     offered for batch operations.  It follows these rules:
+       – Internally sets `mol.dirty = true` (a `Cell<bool>`) while live.
+       – Provides an explicit `commit(self) -> &mut Mol` that performs
+         sanitisation, resets `dirty`, and returns the `&mut Mol`.
+       – `Drop` also commits as a fallback, but all query methods on `Mol`
+         call `ensure_clean()` first, so even if someone leaks the editor via
+         `mem::forget()` the next read lazily sanitises and clears the flag.
+       – Marked `#[must_use]` so the compiler warns if the value is ignored.
+     This removes unsoundness without relying on `Drop` being executed.
    • Conformers keep `Vec<Point3D>` coordinate arrays.  
    • Descriptors & fingerprints gradually ported.
 
