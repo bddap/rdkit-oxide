@@ -122,7 +122,7 @@ This file is updated incrementally to survive context compression.  Each top-lev
   - [x] Implement FPB fingerprint binary reader (streaming, memory-mapped).
     - Path: `crates/datastructs/src/fpb.rs`, tests in same module.
 
-- [ ] Geometry crate (to create)
+- [x] Geometry crate (created)
   - [x] Point3D and Vector3D types + basic linear algebra traits (crates/geometry).
   - [x] Transformation matrices / quaternion helpers (crates/geometry).
 
