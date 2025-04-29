@@ -73,6 +73,6 @@ In the last line of ./progress.md, track what you are currently working on. When
 - Commit each change, ensure your working dir doesn't have uncommited changes
 - Mark the task as done in ./progress.md.
 - Replace the last line of ./progress.md with your next task.
+- *Do not* report back or speak to the user until all stages are complete.
 
 I’ll be watching ./progress.md
-
