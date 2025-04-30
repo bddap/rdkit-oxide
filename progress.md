@@ -202,7 +202,8 @@ Update 2025-04-29 – Fixed duplicate inline tests inside `smiles/lexer.rs` that
 10 sample SMILES provided by the user. Workspace now builds cleanly with
 `cargo test` and `cargo clippy -D warnings`.
 
-Implemented ring–bond folding logic in SMILES lexer, plus tests for `C=1` and
-`-%12` forms.  Added error-safe parsing for multi-digit indices.
+Added variable-length ring indices via `%123` style; implemented helper
+`read_variable_number`.  Added tests for `%123` and aromatic two-letter
+lowercase (`se`, `as`). Lexer enhancements compiled & tests pass.
 
-Currently working on: **Stage 5 – SMILES lexer/tokeniser implementation (next up: bracket-atom token details & invalid input handling)**
+Currently working on: **Stage 5 – SMILES lexer/tokeniser implementation (next up: bracket-atom parsing & robust error detection)**
