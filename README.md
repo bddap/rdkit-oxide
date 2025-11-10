@@ -1,4 +1,4 @@
-# RDKit-Rust Workspace
+# chemkit-oxide Workspace
 
 Welcome to the work-in-progress **Rust rewrite of RDKit**.  The goal is to
 provide a fully native, idiomatic Rust implementation of RDKit’s core
